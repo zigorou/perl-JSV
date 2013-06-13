@@ -4,6 +4,7 @@ use strict;
 use warnings;
 
 use Carp;
+use File::Basename;
 use File::Spec;
 use FindBin;
 use JSON;
@@ -13,11 +14,11 @@ sub run {
     my ($class, %opts) = @_;
 
     %opts = (
-        base_dir => File::Spec->catdir($FindBin::Bin, "t/suite/tests"),
+        base_dir => File::Spec->catdir(File::Spec->no_upwards(dirname(__FILE__), "../../../suite/tests")),
         version  => "draft4",
-        suite    => "type.json",
+        suite    => "type",
         cb       => sub {
-            my ($schema, $data) = @_;
+            my ($schema, $instance) = @_;
             my $rv = 1;
             return $rv;
         },
@@ -53,14 +54,17 @@ sub run_test_case {
 
     is(
         $self->{cb}->($schema, $data),
-        !!$expect,
+        $expect ? 1 : 0,
         $desc,
     );
 }
 
 sub load_test_suite {
     my $self = shift;
-    my $test_suite_file = File::Spec->catfile($self->{base_dir}, $self->{version}, $self->{suite});
+    my $test_suite_file = File::Spec->catfile($self->{base_dir}, $self->{version}, $self->{suite} . ".json");
+
+    note $test_suite_file;
+
     unless (-f $test_suite_file) {
         croak sprintf("Not exists test suite (base_dir: %s, version: %s, suite: %s)", @$self{qw/base_dir version suite/});
     }
