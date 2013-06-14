@@ -32,15 +32,22 @@ sub validate {
     if ($items_type eq "object") { ### items as schema
         for (my $i = 0, my $l = scalar @$instance; $i < $l; $i++) {
             push(@{$opts->{pointer_tokens}}, $i);
-            my $orig_type = $opts->{type};
-            $opts->{type} = detect_instance_type($instance->[$i]);
 
-            $validator->validate($items, $instance->[$i], $opts);
-            if ($validator->last_exception) {
-                croak $validator->last_exception;
+            my $orig_type = $opts->{type};
+
+            $opts->{type}  = detect_instance_type($instance->[$i]);
+            $opts->{throw} = 1;
+
+            eval {
+                $validator->validate($items, $instance->[$i], $opts);
+            };
+            if (my $e = $@) {
+                $opts->{throw} = 0;
+                croak $e;
             }
 
             pop(@{$opts->{pointer_tokens}});
+
             $opts->{type} = $orig_type;
         }
         return 1;
@@ -48,27 +55,40 @@ sub validate {
     elsif ($items_type eq "array") { ### items as schema array
         for (my $i = 0, my $l = scalar @$instance; $i < $l; $i++) {
             push(@{$opts->{pointer_tokens}}, $i);
+
             my $orig_type = $opts->{type};
-            $opts->{type} = detect_instance_type($instance->[$i]);
+
+            $opts->{type}  = detect_instance_type($instance->[$i]);
+            $opts->{throw} = 1;
 
             if (defined $items->[$i]) {
-                $validator->validate($items->[$i], $instance->[$i], $opts);
+                eval {
+                    $validator->validate($items->[$i], $instance->[$i], $opts);
+                };
+                if (my $e = $@) {
+                    $opts->{throw} = 0;
+                    croak $e;
+                }
             }
             elsif ($additional_items_type eq "object") {
-                $validator->validate($additional_items, $instance->[$i], $opts);
+                eval {
+                    $validator->validate($additional_items, $instance->[$i], $opts);
+                };
+                if (my $e = $@) {
+                    $opts->{throw} = 0;
+                    croak $e;
+                }
             }
             elsif ($additional_items_type eq "boolean" && $additional_items == 0) {
+                $opts->{throw} = 0;
                 JSV::Exception->throw(
                     "The instance cannot have additional items",
                     $opts,
                 );
             }
 
-            if ($validator->last_exception) {
-                croak $validator->last_exception;
-            }
-
             pop(@{$opts->{pointer_tokens}});
+
             $opts->{type} = $orig_type;
          }
     }

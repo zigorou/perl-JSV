@@ -21,6 +21,7 @@ use JSV::Keyword::Pattern;
 use JSV::Keyword::Items;
 use JSV::Keyword::MaxItems;
 use JSV::Keyword::MinItems;
+use JSV::Keyword::UniqueItems;
 
 use JSV::Util::Type qw(detect_instance_type);
 
@@ -36,10 +37,15 @@ sub validate {
     my $rv;
     $self->{last_exception} = undef;
 
-    $opts ||= {
-        type           => detect_instance_type($instance),
+    $opts ||= {};
+    %$opts = (
+        exists $opts->{type} ? () : (
+            type => detect_instance_type($instance)
+        ),
+        throw          => 0,
         pointer_tokens => [],
-    };
+        %$opts,
+    );
 
     eval {
         JSV::Keyword::Type->validate($self, $schema, $instance, $opts);
@@ -58,12 +64,16 @@ sub validate {
             JSV::Keyword::Items->validate($self, $schema, $instance, $opts);
             JSV::Keyword::MaxItems->validate($self, $schema, $instance, $opts);
             JSV::Keyword::MinItems->validate($self, $schema, $instance, $opts);
+            JSV::Keyword::UniqueItems->validate($self, $schema, $instance, $opts);
         }
 
         $rv = 1;
     };
     if (my $e = $@) {
         $self->last_exception($e);
+        if ($opts->{throw}) {
+            croak $e;
+        }
         $rv = 0;
     }
 
