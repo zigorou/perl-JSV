@@ -7,7 +7,7 @@ use parent qw(JSV::Keyword);
 sub keyword { "multipleOf" }
 
 sub validate {
-    my ($class, $schema, $instance, $opts) = @_;
+    my ($class, $validator, $schema, $instance, $opts) = @_;
     return 1 unless $class->has_keyword($schema);
 
     $opts         ||= {};

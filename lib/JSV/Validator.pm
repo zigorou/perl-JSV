@@ -18,6 +18,8 @@ use JSV::Keyword::MaxLength;
 use JSV::Keyword::MinLength;
 use JSV::Keyword::Pattern;
 
+use JSV::Keyword::Items;
+
 use JSV::Util::Type qw(detect_instance_type);
 
 sub new {
@@ -30,24 +32,28 @@ sub new {
 sub validate {
     my ($self, $schema, $instance, $opts) = @_;
     my $rv;
+    $self->{last_exception} = undef;
 
-    $opts = {
+    $opts ||= {
         type           => detect_instance_type($instance),
         pointer_tokens => [],
     };
 
     eval {
-        JSV::Keyword::Type->validate($schema, $instance, $opts);
+        JSV::Keyword::Type->validate($self, $schema, $instance, $opts);
 
         if ($opts->{type} eq "integer" || $opts->{type} eq "number") {
-            JSV::Keyword::MultipleOf->validate($schema, $instance, $opts);
-            JSV::Keyword::Maximum->validate($schema, $instance, $opts);
-            JSV::Keyword::Minimum->validate($schema, $instance, $opts);
+            JSV::Keyword::MultipleOf->validate($self, $schema, $instance, $opts);
+            JSV::Keyword::Maximum->validate($self, $schema, $instance, $opts);
+            JSV::Keyword::Minimum->validate($self, $schema, $instance, $opts);
         }
         elsif ($opts->{type} eq "string") {
-            JSV::Keyword::MaxLength->validate($schema, $instance, $opts);
-            JSV::Keyword::MinLength->validate($schema, $instance, $opts);
-            JSV::Keyword::Pattern->validate($schema, $instance, $opts);
+            JSV::Keyword::MaxLength->validate($self, $schema, $instance, $opts);
+            JSV::Keyword::MinLength->validate($self, $schema, $instance, $opts);
+            JSV::Keyword::Pattern->validate($self, $schema, $instance, $opts);
+        }
+        elsif ($opts->{type} eq "array") {
+            JSV::Keyword::Items->validate($self, $schema, $instance, $opts);
         }
 
         $rv = 1;

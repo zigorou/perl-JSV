@@ -10,7 +10,7 @@ use JSV::Exception;
 sub keyword { "maximum" }
 
 sub validate {
-    my ($class, $schema, $instance, $opts) = @_;
+    my ($class, $validator, $schema, $instance, $opts) = @_;
     return 1 unless $class->has_keyword($schema);
 
     $opts         ||= {};

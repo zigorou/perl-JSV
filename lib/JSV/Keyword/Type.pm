@@ -15,7 +15,7 @@ use JSV::Util::Type qw(detect_instance_type);
 sub keyword { "type" }
 
 sub validate {
-    my ($class, $schema, $instance, $opts) = @_;
+    my ($class, $validator, $schema, $instance, $opts) = @_;
     return 1 unless $class->has_keyword($schema);
 
     $opts ||= {};
