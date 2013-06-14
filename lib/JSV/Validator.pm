@@ -10,6 +10,7 @@ use Class::Accessor::Lite (
 
 use JSV::Keyword::Type;
 use JSV::Keyword::MultipleOf;
+use JSV::Keyword::Maximum;
 use JSV::Util::Type qw(detect_instance_type);
 
 sub new {
@@ -33,6 +34,7 @@ sub validate {
 
         if ($opts->{type} eq "integer" || $opts->{type} eq "number") {
             JSV::Keyword::MultipleOf->validate($schema, $instance, $opts);
+            JSV::Keyword::Maximum->validate($schema, $instance, $opts);
         }
 
         $rv = 1;

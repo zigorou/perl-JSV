@@ -16,8 +16,9 @@ sub has_keyword {
 }
 
 sub keyword_value {
-    my ($class, $schema) = @_;
-    return $schema->{$class->keyword};
+    my ($class, $schema, $keyword) = @_;
+    $keyword ||= $class->keyword;
+    return $schema->{$keyword};
 }
 
 sub initialize_args {
