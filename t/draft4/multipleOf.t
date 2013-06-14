@@ -8,7 +8,7 @@ use JSV::Keyword::Type;
 my $validator = JSV::Validator->new;
 Test::JSV::Suite->run(
     version => "draft4",
-    suite   => "type",
+    suite   => "multipleOf",
     cb      => sub {
         my ($schema, $instance) = @_;
         return $validator->validate($schema, $instance);

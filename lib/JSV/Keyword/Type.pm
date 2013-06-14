@@ -2,72 +2,53 @@ package JSV::Keyword::Type;
 
 use strict;
 use warnings;
+use parent qw(JSV::Keyword);
 
 use B;
 use JSON;
+use List::Util qw(first);
 use Scalar::Util qw(blessed);
 
+use JSV::Exception;
+use JSV::Util::Type qw(detect_instance_type);
+
+sub keyword { "type" }
+
 sub validate {
-    my ($class, $schema, $instance) = @_;
-    my $rv;
+    my ($class, $schema, $instance, $opts) = @_;
+    return 1 unless $class->has_keyword($schema);
 
-    return 1 unless exists $schema->{type};
-
-    my $keyword_value = $schema->{type};
+    $opts ||= {};
+    $class->initialize_args($schema, $instance, $opts);
+    my $keyword_value = $class->keyword_value($schema);
 
     if (ref $keyword_value eq "ARRAY") {
-        for my $type (@$keyword_value) {
-            $rv = $class->validate_singular_type($type, $instance);
-            last if $rv;
+        if ( first { $class->validate_singular_type( $_, $opts->{type} ) } @$keyword_value ) {
+            return 1;
         }
-        return $rv;
+        else {
+            JSV::Exception->throw("instance type doesn't match schema type list", $opts);
+        }
     }
     else {
-        return $class->validate_singular_type($keyword_value, $instance);
+        if ($class->validate_singular_type( $keyword_value, $opts->{type} )) {
+            return 1;
+        }
+        else {
+            JSV::Exception->throw("instance type doesn't match schema type", $opts);
+        }
     }
 }
 
 sub validate_singular_type {
-    my ($class, $type, $instance) = @_;
-    return $class->can("validate_type_" . $type)->($class, $instance);
-}
+    my ($class, $schema_type, $given_type) = @_;
 
-sub validate_type_array {
-    my ($class, $instance) = @_;
-    return ref $instance eq "ARRAY" ? 1 : 0;
-}
-
-sub validate_type_boolean {
-    my ($class, $instance) = @_;
-    return JSON::is_bool($instance) ? 1 : 0;
-}
-
-sub validate_type_integer {
-    my ($class, $instance) = @_;
-    my $flags = B::svref_2object(\$instance)->FLAGS;
-    return $flags & B::SVp_IOK ? 1 : 0;
-}
-
-sub validate_type_null {
-    my ($class, $instance) = @_;
-    return !defined $instance ? 1 : 0;
-}
-
-sub validate_type_number {
-    my ($class, $instance) = @_;
-    my $flags = B::svref_2object(\$instance)->FLAGS;
-    return $flags & ( B::SVp_IOK | B::SVp_NOK ) ? 1 : 0;
-}
-
-sub validate_type_object {
-    my ($class, $instance) = @_;
-    return (ref $instance eq "HASH" && !blessed $instance) ? 1 : 0;
-}
-
-sub validate_type_string {
-    my ($class, $instance) = @_;
-    my $flags = B::svref_2object(\$instance)->FLAGS;
-    return $flags & B::SVp_POK ? 1 : 0;
+    if ( $schema_type eq $given_type || ( $schema_type eq "number" && $given_type eq "integer") ) {
+        return 1;
+    }
+    else {
+        return 0;
+    }
 }
 
 1;
