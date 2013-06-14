@@ -9,9 +9,13 @@ use Class::Accessor::Lite (
 );
 
 use JSV::Keyword::Type;
+
 use JSV::Keyword::MultipleOf;
 use JSV::Keyword::Maximum;
 use JSV::Keyword::Minimum;
+
+use JSV::Keyword::MaxLength;
+
 use JSV::Util::Type qw(detect_instance_type);
 
 sub new {
@@ -37,6 +41,9 @@ sub validate {
             JSV::Keyword::MultipleOf->validate($schema, $instance, $opts);
             JSV::Keyword::Maximum->validate($schema, $instance, $opts);
             JSV::Keyword::Minimum->validate($schema, $instance, $opts);
+        }
+        elsif ($opts->{type} eq "string") {
+            JSV::Keyword::MaxLength->validate($schema, $instance, $opts);
         }
 
         $rv = 1;
