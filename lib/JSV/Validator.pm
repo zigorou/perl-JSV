@@ -23,6 +23,9 @@ use JSV::Keyword::MaxItems;
 use JSV::Keyword::MinItems;
 use JSV::Keyword::UniqueItems;
 
+use JSV::Keyword::MaxProperties;
+use JSV::Keyword::MinProperties;
+
 use JSV::Util::Type qw(detect_instance_type);
 
 sub new {
@@ -65,6 +68,10 @@ sub validate {
             JSV::Keyword::MaxItems->validate($self, $schema, $instance, $opts);
             JSV::Keyword::MinItems->validate($self, $schema, $instance, $opts);
             JSV::Keyword::UniqueItems->validate($self, $schema, $instance, $opts);
+        }
+        elsif ($opts->{type} eq "object") {
+            JSV::Keyword::MaxProperties->validate($self, $schema, $instance, $opts);
+            JSV::Keyword::MinProperties->validate($self, $schema, $instance, $opts);
         }
 
         $rv = 1;
