@@ -19,6 +19,7 @@ use JSV::Keyword::MinLength;
 use JSV::Keyword::Pattern;
 
 use JSV::Keyword::Items;
+use JSV::Keyword::MaxItems;
 
 use JSV::Util::Type qw(detect_instance_type);
 
@@ -54,6 +55,7 @@ sub validate {
         }
         elsif ($opts->{type} eq "array") {
             JSV::Keyword::Items->validate($self, $schema, $instance, $opts);
+            JSV::Keyword::MaxItems->validate($self, $schema, $instance, $opts);
         }
 
         $rv = 1;
