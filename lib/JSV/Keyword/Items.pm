@@ -27,6 +27,7 @@ sub validate {
     my $additional_items = $class->keyword_value($schema, "additionalItems");
 
     my $items_type = detect_instance_type($items);
+    my $additional_items_type = detect_instance_type($additional_items);
 
     if ($items_type eq "object") { ### items as schema
         for (my $i = 0, my $l = scalar @$instance; $i < $l; $i++) {
@@ -45,12 +46,24 @@ sub validate {
         return 1;
     }
     elsif ($items_type eq "array") { ### items as schema array
-        for (my $i = 0, my $l = scalar @$items; $i < $l; $i++) {
+        for (my $i = 0, my $l = scalar @$instance; $i < $l; $i++) {
             push(@{$opts->{pointer_tokens}}, $i);
             my $orig_type = $opts->{type};
             $opts->{type} = detect_instance_type($instance->[$i]);
 
-            $validator->validate($items->[$i], $instance->[$i], $opts);
+            if (defined $items->[$i]) {
+                $validator->validate($items->[$i], $instance->[$i], $opts);
+            }
+            elsif ($additional_items_type eq "object") {
+                $validator->validate($additional_items, $instance->[$i], $opts);
+            }
+            elsif ($additional_items_type eq "boolean" && $additional_items == 0) {
+                JSV::Exception->throw(
+                    "The instance cannot have additional items",
+                    $opts,
+                );
+            }
+
             if ($validator->last_exception) {
                 croak $validator->last_exception;
             }
