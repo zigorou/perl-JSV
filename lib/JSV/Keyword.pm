@@ -11,8 +11,10 @@ sub keyword {
 }
 
 sub has_keyword {
-    my ($class, $schema) = @_;
-    exists $schema->{$class->keyword} ? 1 : 0;
+    my ($class, $schema, $keyword) = @_;
+    $keyword ||= $class->keyword;
+
+    exists $schema->{$keyword} ? 1 : 0;
 }
 
 sub keyword_value {
