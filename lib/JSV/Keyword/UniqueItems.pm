@@ -4,10 +4,7 @@ use strict;
 use warnings;
 use parent qw(JSV::Keyword);
 
-use JSON;
 use List::MoreUtils qw(uniq);
-
-our $JSON = JSON->new->allow_nonref;
 
 sub keyword { "uniqueItems" }
 
@@ -26,7 +23,7 @@ sub validate {
 
     if ($keyword_value) {
         my @unique = uniq map {
-            $JSON->encode($_)
+            $validator->json->encode($_)
         } @$instance;
 
         if (scalar @unique == scalar @$instance) {

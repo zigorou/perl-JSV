@@ -5,9 +5,11 @@ use warnings;
 
 use Class::Accessor::Lite (
     new => 0,
-    rw  => [qw/last_exception/]
+    rw  => [qw/json last_exception/]
 );
+use JSON;
 
+use JSV::Keyword::Enum;
 use JSV::Keyword::Type;
 
 use JSV::Keyword::MultipleOf;
@@ -35,6 +37,7 @@ sub new {
     my $class = shift;
     bless {
         last_exception => undef,
+        json           => JSON->new->allow_nonref,
     } => $class;
 }
 
@@ -54,6 +57,7 @@ sub validate {
     );
 
     eval {
+        JSV::Keyword::Enum->validate($self, $schema, $instance, $opts);
         JSV::Keyword::Type->validate($self, $schema, $instance, $opts);
 
         if ($opts->{type} eq "integer" || $opts->{type} eq "number") {
