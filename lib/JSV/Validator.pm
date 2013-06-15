@@ -27,6 +27,7 @@ use JSV::Keyword::MaxProperties;
 use JSV::Keyword::MinProperties;
 use JSV::Keyword::Required;
 use JSV::Keyword::Properties;
+use JSV::Keyword::Dependencies;
 
 use JSV::Util::Type qw(detect_instance_type);
 
@@ -76,6 +77,7 @@ sub validate {
             JSV::Keyword::MinProperties->validate($self, $schema, $instance, $opts);
             JSV::Keyword::Required->validate($self, $schema, $instance, $opts);
             JSV::Keyword::Properties->validate($self, $schema, $instance, $opts);
+            JSV::Keyword::Dependencies->validate($self, $schema, $instance, $opts);
         }
 
         $rv = 1;
