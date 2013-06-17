@@ -10,6 +10,7 @@ use Class::Accessor::Lite (
 use JSON;
 
 use JSV::Keyword::Enum;
+use JSV::Keyword::Ref;
 use JSV::Keyword::Type;
 
 use JSV::Keyword::MultipleOf;
@@ -51,12 +52,16 @@ sub validate {
         exists $opts->{type} ? () : (
             type => detect_instance_type($instance)
         ),
+        exists $opts->{schema} ? () : (
+            schema => $schema
+        ),
         throw          => 0,
         pointer_tokens => [],
         %$opts,
     );
 
     eval {
+        JSV::Keyword::Ref->validate($self, $schema, $instance, $opts);
         JSV::Keyword::Enum->validate($self, $schema, $instance, $opts);
         JSV::Keyword::Type->validate($self, $schema, $instance, $opts);
 
