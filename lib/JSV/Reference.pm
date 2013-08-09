@@ -5,6 +5,7 @@ use warnings;
 
 use Carp;
 use JSON::Pointer;
+use Scalar::Util qw(weaken);
 use URI;
 use URI::Split qw(uri_split uri_join);
 
@@ -16,6 +17,7 @@ sub new {
 
     %$args = (
         registered_schema_map => {},
+        max_recursion         => 10,
         %$args,
     );
 
@@ -37,29 +39,40 @@ sub resolve {
     my $ref_uri = URI->new($ref->{'$ref'});
     my ($normalize_uri, $fragment);
 
+    my $ref_obj;
+
     if ($ref_uri->scheme) {
-        return $self->get_schema($ref_uri);
+        $ref_obj = $self->get_schema($ref_uri);
     }
     else {
         if ( ( $ref_uri->path || $ref_uri->query ) && $opts->{base_uri} ) {
-            return $self->get_schema($ref_uri->clone->abs($opts->{base_uri}));
+            $ref_obj = $self->get_schema($ref_uri->clone->abs($opts->{base_uri}));
         }
         elsif ( defined $ref_uri->fragment && defined $opts->{root} && ref $opts->{root} eq 'HASH' ) {
             eval {
-                my $ref_obj = JSON::Pointer->get($opts->{root}, $ref_uri->fragment, 1);
-                delete $ref->{'$ref'};
-                %$ref = %$ref_obj;
+                $ref_obj = JSON::Pointer->get($opts->{root}, $ref_uri->fragment, 1);
             };
             if (my $e = $@) {
                 undef $@;
                 return 0;
             }
-            return 1;
         }
         else {
             return 0;
         }
     }
+
+    return 0 unless (ref $ref_obj eq 'HASH');
+
+    ### recursive resolution
+    while (ref $ref_obj eq 'HASH') {
+        my $rv = $self->resolve($ref_obj, $opts);
+        last unless ($rv);
+    }
+    ### TODO: Does this weaken have means?
+    weaken($ref_obj);
+    %$ref = %$ref_obj;
+    return 1;
 
 }
 

@@ -5,7 +5,7 @@ use warnings;
 
 use Class::Accessor::Lite (
     new => 0,
-    rw  => [qw/json last_exception/]
+    rw  => [qw/json reference last_exception/]
 );
 use JSON;
 
@@ -34,11 +34,14 @@ use JSV::Keyword::Dependencies;
 
 use JSV::Util::Type qw(detect_instance_type);
 
+use JSV::Reference;
+
 sub new {
     my $class = shift;
     bless {
         last_exception => undef,
         json           => JSON->new->allow_nonref,
+        reference      => JSV::Reference->new,
     } => $class;
 }
 

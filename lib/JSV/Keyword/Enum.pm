@@ -4,6 +4,7 @@ use strict;
 use warnings;
 use parent qw(JSV::Keyword);
 
+use JSV::Exception;
 use JSV::Util::Type qw(detect_instance_type);
 use JSON;
 use List::Util qw(first);
