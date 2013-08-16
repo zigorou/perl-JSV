@@ -4,6 +4,8 @@ use strict;
 use warnings;
 use parent qw(JSV::Keyword);
 
+use JSV::Exception;
+
 sub keyword { "maxItems" }
 
 sub validate {

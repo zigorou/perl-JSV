@@ -32,6 +32,10 @@ use JSV::Keyword::Required;
 use JSV::Keyword::Properties;
 use JSV::Keyword::Dependencies;
 
+use JSV::Keyword::AllOf;
+use JSV::Keyword::AnyOf;
+use JSV::Keyword::OneOf;
+
 use JSV::Util::Type qw(detect_instance_type);
 
 use JSV::Reference;
@@ -67,6 +71,9 @@ sub validate {
         JSV::Keyword::Ref->validate($self, $schema, $instance, $opts);
         JSV::Keyword::Enum->validate($self, $schema, $instance, $opts);
         JSV::Keyword::Type->validate($self, $schema, $instance, $opts);
+        JSV::Keyword::AllOf->validate($self, $schema, $instance, $opts);
+        JSV::Keyword::AnyOf->validate($self, $schema, $instance, $opts);
+        JSV::Keyword::OneOf->validate($self, $schema, $instance, $opts);
 
         if ($opts->{type} eq "integer" || $opts->{type} eq "number") {
             JSV::Keyword::MultipleOf->validate($self, $schema, $instance, $opts);
