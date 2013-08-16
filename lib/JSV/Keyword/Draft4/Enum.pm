@@ -1,14 +1,16 @@
-package JSV::Keyword::Enum;
+package JSV::Keyword::Draft4::Enum;
 
 use strict;
 use warnings;
 use parent qw(JSV::Keyword);
 
+use JSV::Keyword qw(:constants);
 use JSV::Exception;
 use JSV::Util::Type qw(detect_instance_type);
 use JSON;
 use List::Util qw(first);
 
+sub instance_type { INSTANCE_TYPE_ANY(); }
 sub keyword { "enum" }
 
 sub validate {

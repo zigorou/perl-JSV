@@ -1,4 +1,4 @@
-package JSV::Keyword::Type;
+package JSV::Keyword::Draft4::Type;
 
 use strict;
 use warnings;
@@ -10,8 +10,10 @@ use List::Util qw(first);
 use Scalar::Util qw(blessed);
 
 use JSV::Exception;
+use JSV::Keyword qw(:constants);
 use JSV::Util::Type qw(detect_instance_type);
 
+sub instance_type { INSTANCE_TYPE_ANY(); }
 sub keyword { "type" }
 
 sub validate {

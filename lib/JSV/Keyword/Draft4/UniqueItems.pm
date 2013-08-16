@@ -1,4 +1,4 @@
-package JSV::Keyword::UniqueItems;
+package JSV::Keyword::Draft4::UniqueItems;
 
 use strict;
 use warnings;
@@ -6,6 +6,10 @@ use parent qw(JSV::Keyword);
 
 use List::MoreUtils qw(uniq);
 
+use JSV::Exception;
+use JSV::Keyword qw(:constants);
+
+sub instance_type { INSTANCE_TYPE_ARRAY(); }
 sub keyword { "uniqueItems" }
 
 sub validate {

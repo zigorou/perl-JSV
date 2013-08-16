@@ -8,44 +8,89 @@ use Class::Accessor::Lite (
     rw  => [qw/json reference last_exception/]
 );
 use JSON;
+use Module::Pluggable::Object;
 
-use JSV::Keyword::Enum;
-use JSV::Keyword::Ref;
-use JSV::Keyword::Type;
+use JSV::Keyword qw(:constants);
 
-use JSV::Keyword::MultipleOf;
-use JSV::Keyword::Maximum;
-use JSV::Keyword::Minimum;
+use JSV::Keyword::Draft4::Enum;
+use JSV::Keyword::Draft4::Ref;
+use JSV::Keyword::Draft4::Type;
 
-use JSV::Keyword::MaxLength;
-use JSV::Keyword::MinLength;
-use JSV::Keyword::Pattern;
+use JSV::Keyword::Draft4::MultipleOf;
+use JSV::Keyword::Draft4::Maximum;
+use JSV::Keyword::Draft4::Minimum;
 
-use JSV::Keyword::Items;
-use JSV::Keyword::MaxItems;
-use JSV::Keyword::MinItems;
-use JSV::Keyword::UniqueItems;
+use JSV::Keyword::Draft4::MaxLength;
+use JSV::Keyword::Draft4::MinLength;
+use JSV::Keyword::Draft4::Pattern;
 
-use JSV::Keyword::MaxProperties;
-use JSV::Keyword::MinProperties;
-use JSV::Keyword::Required;
-use JSV::Keyword::Properties;
-use JSV::Keyword::Dependencies;
+use JSV::Keyword::Draft4::Items;
+use JSV::Keyword::Draft4::MaxItems;
+use JSV::Keyword::Draft4::MinItems;
+use JSV::Keyword::Draft4::UniqueItems;
 
-use JSV::Keyword::AllOf;
-use JSV::Keyword::AnyOf;
-use JSV::Keyword::OneOf;
+use JSV::Keyword::Draft4::MaxProperties;
+use JSV::Keyword::Draft4::MinProperties;
+use JSV::Keyword::Draft4::Required;
+use JSV::Keyword::Draft4::Properties;
+use JSV::Keyword::Draft4::Dependencies;
+
+use JSV::Keyword::Draft4::AllOf;
+use JSV::Keyword::Draft4::AnyOf;
+use JSV::Keyword::Draft4::OneOf;
 
 use JSV::Util::Type qw(detect_instance_type);
 
 use JSV::Reference;
 
+my %supported_environments = (
+    draft4 => "Draft4"
+);
+my %environment_keywords = ();
+
+sub load_environments {
+    my ($class, @environments) = @_;
+
+    for my $environment (@environments) {
+        next unless (exists $supported_environments{$environment});
+        my $finder = Module::Pluggable::Object->new(
+            search_path => ["JSV::Keyword::" . $supported_environments{$environment}],
+            require => 1,
+        );
+
+        $environment_keywords{$environment} =  {
+            INSTANCE_TYPE_NUMERIC() => [],
+            INSTANCE_TYPE_STRING()  => [],
+            INSTANCE_TYPE_ARRAY()   => [],
+            INSTANCE_TYPE_OBJECT()  => [],
+            INSTANCE_TYPE_ANY()     => [],
+        };
+        my @keywords = $finder->plugins;
+        for my $keyword (@keywords) {
+            my $type = $keyword->instance_type;
+            push(@{$environment_keywords{$environment}{$type}}, $keyword);
+        }
+    }
+}
+
 sub new {
     my $class = shift;
+    my %args  = @_;
+    %args = (
+        environment => 'draft4',
+        %args,
+    );
+
+    ### RECOMMENDED: you should do to preloading environment before calling constructor
+    unless (exists $environment_keywords{$args{environment}}) {
+        $class->load_environments($args{environment});
+    }
+
     bless {
         last_exception => undef,
         json           => JSON->new->allow_nonref,
         reference      => JSV::Reference->new,
+        %args,
     } => $class;
 }
 
@@ -68,35 +113,29 @@ sub validate {
     );
 
     eval {
-        JSV::Keyword::Ref->validate($self, $schema, $instance, $opts);
-        JSV::Keyword::Enum->validate($self, $schema, $instance, $opts);
-        JSV::Keyword::Type->validate($self, $schema, $instance, $opts);
-        JSV::Keyword::AllOf->validate($self, $schema, $instance, $opts);
-        JSV::Keyword::AnyOf->validate($self, $schema, $instance, $opts);
-        JSV::Keyword::OneOf->validate($self, $schema, $instance, $opts);
+        for ($self->_instance_type_keywords(INSTANCE_TYPE_ANY)) {
+            $_->validate($self, $schema, $instance, $opts);
+        }
 
         if ($opts->{type} eq "integer" || $opts->{type} eq "number") {
-            JSV::Keyword::MultipleOf->validate($self, $schema, $instance, $opts);
-            JSV::Keyword::Maximum->validate($self, $schema, $instance, $opts);
-            JSV::Keyword::Minimum->validate($self, $schema, $instance, $opts);
+            for ($self->_instance_type_keywords(INSTANCE_TYPE_NUMERIC)) {
+                $_->validate($self, $schema, $instance, $opts);
+            }
         }
         elsif ($opts->{type} eq "string") {
-            JSV::Keyword::MaxLength->validate($self, $schema, $instance, $opts);
-            JSV::Keyword::MinLength->validate($self, $schema, $instance, $opts);
-            JSV::Keyword::Pattern->validate($self, $schema, $instance, $opts);
+            for ($self->_instance_type_keywords(INSTANCE_TYPE_STRING)) {
+                $_->validate($self, $schema, $instance, $opts);
+            }
         }
         elsif ($opts->{type} eq "array") {
-            JSV::Keyword::Items->validate($self, $schema, $instance, $opts);
-            JSV::Keyword::MaxItems->validate($self, $schema, $instance, $opts);
-            JSV::Keyword::MinItems->validate($self, $schema, $instance, $opts);
-            JSV::Keyword::UniqueItems->validate($self, $schema, $instance, $opts);
+            for ($self->_instance_type_keywords(INSTANCE_TYPE_ARRAY)) {
+                $_->validate($self, $schema, $instance, $opts);
+            }
         }
         elsif ($opts->{type} eq "object") {
-            JSV::Keyword::MaxProperties->validate($self, $schema, $instance, $opts);
-            JSV::Keyword::MinProperties->validate($self, $schema, $instance, $opts);
-            JSV::Keyword::Required->validate($self, $schema, $instance, $opts);
-            JSV::Keyword::Properties->validate($self, $schema, $instance, $opts);
-            JSV::Keyword::Dependencies->validate($self, $schema, $instance, $opts);
+            for ($self->_instance_type_keywords(INSTANCE_TYPE_OBJECT)) {
+                $_->validate($self, $schema, $instance, $opts);
+            }
         }
 
         $rv = 1;
@@ -110,6 +149,11 @@ sub validate {
     }
 
     return $rv;
+}
+
+sub _instance_type_keywords {
+    my ($self, $instance_type) = @_;
+    return @{$environment_keywords{$self->{environment}}{$instance_type}};
 }
 
 1;

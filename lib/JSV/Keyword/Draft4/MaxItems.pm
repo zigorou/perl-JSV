@@ -1,10 +1,14 @@
-package JSV::Keyword::MultipleOf;
+package JSV::Keyword::Draft4::MaxItems;
 
 use strict;
 use warnings;
 use parent qw(JSV::Keyword);
 
-sub keyword { "multipleOf" }
+use JSV::Exception;
+use JSV::Keyword qw(:constants);
+
+sub instance_type { INSTANCE_TYPE_ARRAY(); }
+sub keyword { "maxItems" }
 
 sub validate {
     my ($class, $validator, $schema, $instance, $opts) = @_;
@@ -13,19 +17,18 @@ sub validate {
     $opts         ||= {};
     $class->initialize_args($schema, $instance, $opts);
 
-    unless ($opts->{type} eq "number" || $opts->{type} eq "integer") {
+    unless ($opts->{type} eq "array") {
         return 1;
     }
 
     my $keyword_value = $class->keyword_value($schema);
-    my $result = $instance / $keyword_value;
 
-    if ($result - int($result) == 0) {
+    if (scalar(@$instance) <= $keyword_value) {
         return 1;
     }
     else {
         JSV::Exception->throw(
-            "The instance doesn't multiple of schema value",
+            "The instance array length is greater than maxItems value",
             $opts,
         );
     }

@@ -1,11 +1,14 @@
-package JSV::Keyword::Properties;
+package JSV::Keyword::Draft4::Properties;
 
 use strict;
 use warnings;
 use parent qw(JSV::Keyword);
 
+use JSV::Exception;
+use JSV::Keyword qw(:constants);
 use JSV::Util::Type qw(detect_instance_type);
 
+sub instance_type { INSTANCE_TYPE_OBJECT(); }
 sub keyword { "properties" }
 
 sub validate {

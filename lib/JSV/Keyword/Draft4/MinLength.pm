@@ -1,12 +1,14 @@
-package JSV::Keyword::MaxItems;
+package JSV::Keyword::Draft4::MinLength;
 
 use strict;
 use warnings;
 use parent qw(JSV::Keyword);
 
 use JSV::Exception;
+use JSV::Keyword qw(:constants);
 
-sub keyword { "maxItems" }
+sub instance_type { INSTANCE_TYPE_STRING(); }
+sub keyword { "minLength" }
 
 sub validate {
     my ($class, $validator, $schema, $instance, $opts) = @_;
@@ -15,18 +17,18 @@ sub validate {
     $opts         ||= {};
     $class->initialize_args($schema, $instance, $opts);
 
-    unless ($opts->{type} eq "array") {
+    unless ($opts->{type} eq "string") {
         return 1;
     }
 
     my $keyword_value = $class->keyword_value($schema);
 
-    if (scalar(@$instance) <= $keyword_value) {
+    if (length($instance) >= $keyword_value) {
         return 1;
     }
     else {
         JSV::Exception->throw(
-            "The instance array length is greater than maxItems value",
+            "The instance length is less than minLength value",
             $opts,
         );
     }

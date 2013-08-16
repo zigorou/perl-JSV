@@ -1,4 +1,4 @@
-package JSV::Keyword::Items;
+package JSV::Keyword::Draft4::Items;
 
 use strict;
 use warnings;
@@ -7,9 +7,11 @@ use parent qw(JSV::Keyword);
 use Carp;
 use Data::Clone;
 
+use JSV::Keyword qw(:constants);
 use JSV::Exception;
 use JSV::Util::Type qw(detect_instance_type);
 
+sub instance_type { INSTANCE_TYPE_ARRAY(); }
 sub keyword { "items" }
 
 sub validate {

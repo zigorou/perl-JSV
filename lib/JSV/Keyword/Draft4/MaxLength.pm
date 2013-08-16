@@ -1,10 +1,14 @@
-package JSV::Keyword::MinLength;
+package JSV::Keyword::Draft4::MaxLength;
 
 use strict;
 use warnings;
 use parent qw(JSV::Keyword);
 
-sub keyword { "minLength" }
+use JSV::Exception;
+use JSV::Keyword qw(:constants);
+
+sub instance_type { INSTANCE_TYPE_STRING(); }
+sub keyword { "maxLength" }
 
 sub validate {
     my ($class, $validator, $schema, $instance, $opts) = @_;
@@ -19,12 +23,12 @@ sub validate {
 
     my $keyword_value = $class->keyword_value($schema);
 
-    if (length($instance) >= $keyword_value) {
+    if (length($instance) <= $keyword_value) {
         return 1;
     }
     else {
         JSV::Exception->throw(
-            "The instance length is less than minLength value",
+            "The instance length is greater than maxLength value",
             $opts,
         );
     }

@@ -4,7 +4,6 @@ use lib "t/lib";
 use Test::JSV::Suite;
 use JSON;
 use JSV::Validator;
-use JSV::Keyword::Type;
 
 my $validator = JSV::Validator->new;
 

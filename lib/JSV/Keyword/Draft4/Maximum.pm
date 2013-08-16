@@ -1,13 +1,15 @@
-package JSV::Keyword::Minimum;
+package JSV::Keyword::Draft4::Maximum;
 
 use strict;
 use warnings;
 use parent qw(JSV::Keyword);
 use JSON;
 
+use JSV::Keyword qw(:constants);
 use JSV::Exception;
 
-sub keyword { "minimum" }
+sub instance_type { INSTANCE_TYPE_NUMERIC(); }
+sub keyword { "maximum" }
 
 sub validate {
     my ($class, $validator, $schema, $instance, $opts) = @_;
@@ -20,27 +22,27 @@ sub validate {
         return 1;
     }
 
-    my $minimum           = $class->keyword_value($schema);
-    my $exclusive_minimum = $class->keyword_value($schema, "exclusiveMinimum") || JSON::false;
+    my $maximum           = $class->keyword_value($schema);
+    my $exclusive_maximum = $class->keyword_value($schema, "exclusiveMaximum") || JSON::false;
 
-    unless ($exclusive_minimum) {
-        if ($instance >= $minimum) {
+    unless ($exclusive_maximum) {
+        if ($instance <= $maximum) {
             return 1;
         }
         else {
             JSV::Exception->throw(
-                "The instance value is less than minimum keyword value",
+                "The instance value is greater than maximum keyword value",
                 $opts,
             );
         }
     }
     else {
-        if ($instance > $minimum) {
+        if ($instance < $maximum) {
             return 1;
         }
         else {
             JSV::Exception->throw(
-                "The instance value is less than or equals minimum keyword value",
+                "The instance value is greater than or equals maximum keyword value",
                 $opts,
             );
         }

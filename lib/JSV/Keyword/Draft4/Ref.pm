@@ -1,9 +1,13 @@
-package JSV::Keyword::Ref;
+package JSV::Keyword::Draft4::Ref;
 
 use strict;
 use warnings;
 use parent qw(JSV::Keyword);
 
+use JSV::Exception;
+use JSV::Keyword qw(:constants);
+
+sub instance_type { INSTANCE_TYPE_ANY(); }
 sub keyword { '$ref' }
 
 sub validate {

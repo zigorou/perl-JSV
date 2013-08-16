@@ -1,10 +1,14 @@
-package JSV::Keyword::MinItems;
+package JSV::Keyword::Draft4::Required;
 
 use strict;
 use warnings;
 use parent qw(JSV::Keyword);
 
-sub keyword { "minItems" }
+use JSV::Exception;
+use JSV::Keyword qw(:constants);
+
+sub instance_type { INSTANCE_TYPE_OBJECT(); }
+sub keyword { "required" }
 
 sub validate {
     my ($class, $validator, $schema, $instance, $opts) = @_;
@@ -13,18 +17,19 @@ sub validate {
     $opts         ||= {};
     $class->initialize_args($schema, $instance, $opts);
 
-    unless ($opts->{type} eq "array") {
+    unless ($opts->{type} eq "object") {
         return 1;
     }
 
     my $keyword_value = $class->keyword_value($schema);
 
-    if (scalar(@$instance) >= $keyword_value) {
+    my @missing_properties = ( grep { !exists $instance->{$_} } @$keyword_value );
+    if ( @missing_properties == 0 ) {
         return 1;
     }
     else {
         JSV::Exception->throw(
-            "The instance array length is less than minItems value",
+            sprintf("The instance properties has not required properties (missing: %s)", join(", ", @missing_properties)),
             $opts,
         );
     }

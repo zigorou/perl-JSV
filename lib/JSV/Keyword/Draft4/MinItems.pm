@@ -1,10 +1,14 @@
-package JSV::Keyword::MinProperties;
+package JSV::Keyword::Draft4::MinItems;
 
 use strict;
 use warnings;
 use parent qw(JSV::Keyword);
 
-sub keyword { "minProperties" }
+use JSV::Exception;
+use JSV::Keyword qw(:constants);
+
+sub instance_type { INSTANCE_TYPE_ARRAY(); }
+sub keyword { "minItems" }
 
 sub validate {
     my ($class, $validator, $schema, $instance, $opts) = @_;
@@ -13,18 +17,18 @@ sub validate {
     $opts         ||= {};
     $class->initialize_args($schema, $instance, $opts);
 
-    unless ($opts->{type} eq "object") {
+    unless ($opts->{type} eq "array") {
         return 1;
     }
 
     my $keyword_value = $class->keyword_value($schema);
 
-    if (scalar keys %$instance >= $keyword_value) {
+    if (scalar(@$instance) >= $keyword_value) {
         return 1;
     }
     else {
         JSV::Exception->throw(
-            "The instance properties is less than minProperties value",
+            "The instance array length is less than minItems value",
             $opts,
         );
     }
