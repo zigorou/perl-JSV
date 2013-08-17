@@ -9,6 +9,7 @@ requires 'JSON';
 requires 'JSON::Pointer';
 requires 'List::Util';
 requires 'List::MoreUtils';
+requires 'Module::Pluggable::Object';
 requires 'Scalar::Util';
 requires 'URI';
 requires 'URI::Split';

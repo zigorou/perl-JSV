@@ -8,40 +8,10 @@ use Class::Accessor::Lite (
     rw  => [qw/json reference last_exception/]
 );
 use JSON;
-use Module::Pluggable::Object;
-
 use JSV::Keyword qw(:constants);
-
-use JSV::Keyword::Draft4::Enum;
-use JSV::Keyword::Draft4::Ref;
-use JSV::Keyword::Draft4::Type;
-
-use JSV::Keyword::Draft4::MultipleOf;
-use JSV::Keyword::Draft4::Maximum;
-use JSV::Keyword::Draft4::Minimum;
-
-use JSV::Keyword::Draft4::MaxLength;
-use JSV::Keyword::Draft4::MinLength;
-use JSV::Keyword::Draft4::Pattern;
-
-use JSV::Keyword::Draft4::Items;
-use JSV::Keyword::Draft4::MaxItems;
-use JSV::Keyword::Draft4::MinItems;
-use JSV::Keyword::Draft4::UniqueItems;
-
-use JSV::Keyword::Draft4::MaxProperties;
-use JSV::Keyword::Draft4::MinProperties;
-use JSV::Keyword::Draft4::Required;
-use JSV::Keyword::Draft4::Properties;
-use JSV::Keyword::Draft4::Dependencies;
-
-use JSV::Keyword::Draft4::AllOf;
-use JSV::Keyword::Draft4::AnyOf;
-use JSV::Keyword::Draft4::OneOf;
-
 use JSV::Util::Type qw(detect_instance_type);
-
 use JSV::Reference;
+use Module::Pluggable::Object;
 
 my %supported_environments = (
     draft4 => "Draft4"
@@ -157,3 +127,85 @@ sub _instance_type_keywords {
 }
 
 1;
+
+__END__
+
+=encoding utf-8
+
+=head1 NAME
+
+JSV::Validator - A perl implementation of JSON Schema validator
+
+=head1 SYNOPSIS
+
+  use feature qw(say);
+  use JSV::Validator;
+
+  JSV::Validator->load_environments("draft4");
+  my $v = JSV::Validator->new(
+    environment => "draft4"
+  );
+
+  my $schema = {
+    type => "object",
+    properties => {
+      foo => { type => "integer" },
+      bar => { type => "string" }
+    },
+    required => [ "foo" ]
+  };
+
+  say $v->validate($schema, {}); # invalid
+  say $v->validate($schema, { foo => 1 }); # valid
+  say $v->validate($schema, { foo => 10, bar => "xyz" }); # valid
+  say $v->validate($schema, { foo => 1.2, bar => "xyz" }); # invalid
+
+=head1 DESCRIPTION
+
+=head1 METHODS
+
+=head1 SEE ALSO
+
+=over
+
+=item L<http://json-schema.org/>
+
+=item L<B>
+
+=item L<Class::Accessor::Lite>
+
+=item L<Data::Clone>
+
+=item L<Exporter>
+
+=item L<JSON>
+
+=item L<JSON::Pointer>
+
+=item L<List::Util>
+
+=item L<List::MoreUtils>
+
+=item L<Module::Pluggable::Object>
+
+=item L<Scalar::Util>
+
+=item L<URI>
+
+=item L<URI::Split>
+
+=back
+
+=head1 LICENSE
+
+Copyright (C) Toru Yamaguchi
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=head1 AUTHOR
+
+Toru Yamaguchi E<lt>zigorou@cpan.orgE<gt>
+
+=cut
+
