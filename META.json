@@ -1,10 +1,10 @@
 {
-   "abstract" : "It's new $module",
+   "abstract" : "JSON Schema implementation of Perl",
    "author" : [
       "zigorou <zigorou@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v0.3.2, CPAN::Meta::Converter version 2.130870",
+   "generated_by" : "Minilla/v0.6.2, CPAN::Meta::Converter version 2.120921",
    "license" : [
       "perl_5"
    ],
@@ -37,11 +37,24 @@
             "Test::CPAN::Meta" : "0",
             "Test::MinimumVersion" : "0.10108",
             "Test::Pod" : "1.41",
-            "Test::Spellunker" : "v0.2.2"
+            "Test::Spellunker" : "v0.2.7"
          }
       },
       "runtime" : {
          "requires" : {
+            "B" : "0",
+            "Carp" : "0",
+            "Class::Accessor::Lite" : "0",
+            "Data::Clone" : "0",
+            "Exporter" : "0",
+            "JSON" : "0",
+            "JSON::Pointer" : "0",
+            "List::MoreUtils" : "0",
+            "List::Util" : "0",
+            "Module::Pluggable::Object" : "0",
+            "Scalar::Util" : "0",
+            "URI" : "0",
+            "URI::Split" : "0",
             "perl" : "5.008005"
          }
       },
@@ -52,5 +65,16 @@
       }
    },
    "release_status" : "unstable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/zentooo/perl-JSV/issues"
+      },
+      "homepage" : "https://github.com/zentooo/perl-JSV",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/zentooo/perl-JSV.git",
+         "web" : "https://github.com/zentooo/perl-JSV"
+      }
+   },
    "version" : "0.01"
 }
