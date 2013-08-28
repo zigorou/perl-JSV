@@ -39,14 +39,14 @@ sub resolve {
     my $ref_uri = URI->new($ref->{'$ref'});
     my ($normalize_uri, $fragment);
 
-    my $ref_obj;
+    my ($ref_obj, $parent_schema);
 
     if ($ref_uri->scheme) {
-        $ref_obj = $self->get_schema($ref_uri);
+        ($ref_obj, $parent_schema) = $self->get_schema($ref_uri);
     }
     else {
         if ( ( $ref_uri->path || $ref_uri->query ) && $opts->{base_uri} ) {
-            $ref_obj = $self->get_schema($ref_uri->clone->abs($opts->{base_uri}));
+            ($ref_obj, $parent_schema) = $self->get_schema($ref_uri->clone->abs($opts->{base_uri}));
         }
         elsif ( defined $ref_uri->fragment && defined $opts->{root} && ref $opts->{root} eq 'HASH' ) {
             eval {
@@ -66,6 +66,7 @@ sub resolve {
 
     ### recursive resolution
     while (ref $ref_obj eq 'HASH') {
+        $opts->{root} = $parent_schema if $parent_schema;
         my $rv = $self->resolve($ref_obj, $opts);
         last unless ($rv);
     }
@@ -92,7 +93,7 @@ sub get_schema {
             undef $@;
             return;
         }
-        return $inner_schema;
+        return ($inner_schema, $schema);
     }
 
     return $schema;
