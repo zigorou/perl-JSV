@@ -23,7 +23,7 @@ sub validate {
         local $opts->{type}  = detect_instance_type($instance);
         local $opts->{throw} = 1;
 
-        $validator->validate($sub_schema, $instance, $opts);
+        $validator->_validate($sub_schema, $instance, $opts);
     }
 
     return 1;

@@ -4,6 +4,8 @@ use strict;
 use warnings;
 
 use Carp;
+use Clone qw(clone);
+use Data::Walk;
 use JSON::Pointer;
 use Scalar::Util qw(weaken);
 use URI;
@@ -37,31 +39,30 @@ sub resolve {
     return 0 unless (exists $ref->{'$ref'});
 
     my $ref_uri = URI->new($ref->{'$ref'});
-    my ($normalize_uri, $fragment);
+    if ( !$ref_uri->scheme && $opts->{base_uri} ) {
+        $ref_uri = $ref_uri->abs($opts->{base_uri});
+    }
 
+    my ($normalize_uri, $fragment);
     my ($ref_obj, $parent_schema);
 
     if ($ref_uri->scheme) {
         ($ref_obj, $parent_schema) = $self->get_schema($ref_uri);
     }
-    else {
-        if ( ( $ref_uri->path || $ref_uri->query ) && $opts->{base_uri} ) {
-            ($ref_obj, $parent_schema) = $self->get_schema($ref_uri->clone->abs($opts->{base_uri}));
-        }
-        elsif ( defined $ref_uri->fragment && defined $opts->{root} && ref $opts->{root} eq 'HASH' ) {
-            eval {
-                $ref_obj = JSON::Pointer->get($opts->{root}, $ref_uri->fragment, 1);
-            };
-            if (my $e = $@) {
-                undef $@;
-                return 0;
-            }
-        }
-        else {
+    elsif ( defined $ref_uri->fragment && defined $opts->{root} && ref $opts->{root} eq 'HASH' ) {
+        eval {
+            $ref_obj = JSON::Pointer->get($opts->{root}, $ref_uri->fragment, 1);
+        };
+        if (my $e = $@) {
+            undef $@;
             return 0;
         }
     }
+    else {
+        return 0;
+    }
 
+    ### TODO: should throw exception
     return 0 unless (ref $ref_obj eq 'HASH');
 
     ### recursive resolution
@@ -73,6 +74,7 @@ sub resolve {
     ### TODO: Does this weaken have means?
     weaken($ref_obj);
     %$ref = %$ref_obj;
+    $ref->{id} = $ref_uri->as_string;
     return 1;
 
 }
@@ -102,7 +104,26 @@ sub get_schema {
 sub register_schema {
     my ($self, $uri, $schema) = @_;
     my $normalized_uri = $self->normalize_uri($uri);
-    $self->{registered_schema_map}{$normalized_uri} = $schema;
+    my $cloned_schema = clone($schema);
+
+    ### recursive reference resolution
+    walkdepth(+{
+        wanted => sub {
+            if (
+                defined $Data::Walk::type && 
+                $Data::Walk::type eq "HASH" && 
+                exists $_->{'$ref'} && 
+                !ref $_->{'$ref'} && 
+                keys %$_ == 1
+            ) {
+                my $ref_uri = URI->new($_->{'$ref'});
+                return if $ref_uri->scheme;
+                $_->{'$ref'} = $ref_uri->abs($normalized_uri)->as_string;
+            }
+        },
+    }, $cloned_schema);
+
+    $self->{registered_schema_map}{$normalized_uri} = $cloned_schema;
 }
 
 sub unregister_schema {

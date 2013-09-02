@@ -52,18 +52,18 @@ sub validate {
         local $opts->{throw} = 1;
 
         if (exists $properties->{$property}) {
-            $validator->validate($properties->{$property}, $instance->{$property}, $opts);
+            $validator->_validate($properties->{$property}, $instance->{$property}, $opts);
             delete $s{$property};
         }
 
         for (my $i = 0, my $l = scalar(@patterns); $i < $l; $i++) {
             next unless ($property =~ m/$patterns[$i]/);
-            $validator->validate($pattern_schemas[$i], $instance->{$property}, $opts);
+            $validator->_validate($pattern_schemas[$i], $instance->{$property}, $opts);
             delete $s{$property};
         }
 
         if (exists $s{$property} && $additional_properties_type eq "object") {
-            $validator->validate($additional_properties, $instance->{$property}, $opts);
+            $validator->_validate($additional_properties, $instance->{$property}, $opts);
         }
     }
 

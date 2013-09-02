@@ -5,7 +5,6 @@ use warnings;
 use parent qw(JSV::Keyword);
 
 use Carp;
-use Data::Clone;
 
 use JSV::Keyword qw(:constants);
 use JSV::Exception;
@@ -41,7 +40,7 @@ sub validate {
             $opts->{throw} = 1;
 
             eval {
-                $validator->validate($items, $instance->[$i], $opts);
+                $validator->_validate($items, $instance->[$i], $opts);
             };
             if (my $e = $@) {
                 $opts->{throw} = 0;
@@ -65,7 +64,7 @@ sub validate {
 
             if (defined $items->[$i]) {
                 eval {
-                    $validator->validate($items->[$i], $instance->[$i], $opts);
+                    $validator->_validate($items->[$i], $instance->[$i], $opts);
                 };
                 if (my $e = $@) {
                     $opts->{throw} = 0;
@@ -74,7 +73,7 @@ sub validate {
             }
             elsif ($additional_items_type eq "object") {
                 eval {
-                    $validator->validate($additional_items, $instance->[$i], $opts);
+                    $validator->_validate($additional_items, $instance->[$i], $opts);
                 };
                 if (my $e = $@) {
                     $opts->{throw} = 0;

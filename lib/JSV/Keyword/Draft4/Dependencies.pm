@@ -45,7 +45,7 @@ sub validate {
             local $opts->{type}  = detect_instance_type($instance);
             local $opts->{throw} = 1;
 
-            $validator->validate($dependencies->{$property}, $instance, $opts);
+            $validator->_validate($dependencies->{$property}, $instance, $opts);
         }
     }
 

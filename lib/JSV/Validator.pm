@@ -5,8 +5,9 @@ use warnings;
 
 use Class::Accessor::Lite (
     new => 0,
-    rw  => [qw/json reference last_exception/]
+    rw  => [qw/json reference last_exception resolved_schema/]
 );
+use Clone qw(clone);
 use JSON;
 use JSV::Keyword qw(:constants);
 use JSV::Util::Type qw(detect_instance_type);
@@ -58,6 +59,7 @@ sub new {
 
     bless {
         last_exception => undef,
+        resolved_schema => undef,
         json           => JSON->new->allow_nonref,
         reference      => JSV::Reference->new,
         %args,
@@ -65,9 +67,27 @@ sub new {
 }
 
 sub validate {
-    my ($self, $schema, $instance, $opts) = @_;
+    my ($self, $schema, $instance) = @_;
+
+    my $cloned_schema = clone($schema);
+    my $opts = +{
+        type => detect_instance_type($instance),
+        schema => $cloned_schema,
+        throw          => 0,
+        pointer_tokens => [],
+    };
+
     my $rv;
     $self->{last_exception} = undef;
+    $self->{resolved_schema} = undef;
+    $rv = $self->_validate($cloned_schema, $instance, $opts);
+    $self->{resolved_schema} = $cloned_schema;
+
+    return $rv;
+}
+
+sub _validate {
+    my ($self, $schema, $instance, $opts) = @_;
 
     $opts ||= {};
     %$opts = (
@@ -77,10 +97,12 @@ sub validate {
         exists $opts->{schema} ? () : (
             schema => $schema
         ),
-        throw          => 0,
+        throw          => 1,
         pointer_tokens => [],
         %$opts,
     );
+
+    my $rv;
 
     eval {
         for ($self->_instance_type_keywords(INSTANCE_TYPE_ANY)) {

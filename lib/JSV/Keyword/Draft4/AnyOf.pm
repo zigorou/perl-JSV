@@ -25,7 +25,7 @@ sub validate {
         local $opts->{type}  = detect_instance_type($instance);
         local $opts->{throw} = 0;
 
-        my $rv = $validator->validate($sub_schema, $instance, $opts);
+        my $rv = $validator->_validate($sub_schema, $instance, $opts);
         $valid_cnt += $rv;
     }
 
