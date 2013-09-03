@@ -39,6 +39,10 @@ sub keyword {
     croak "keyword method is abstract method";
 }
 
+sub keyword_priority {
+    croak "keyword_priority method is abstract method";
+}
+
 sub has_keyword {
     my ($class, $schema, $keyword) = @_;
     $keyword ||= $class->keyword;

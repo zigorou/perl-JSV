@@ -11,6 +11,7 @@ use List::Util qw(first);
 
 sub instance_type { INSTANCE_TYPE_OBJECT(); }
 sub keyword { "dependencies" }
+sub keyword_priority { 10; }
 
 sub validate {
     my ($class, $validator, $schema, $instance, $opts) = @_;

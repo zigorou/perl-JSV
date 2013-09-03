@@ -12,6 +12,7 @@ use List::Util qw(first);
 
 sub instance_type { INSTANCE_TYPE_ANY(); }
 sub keyword { "enum" }
+sub keyword_priority { 10; }
 
 sub validate {
     my ($class, $validator, $schema, $instance, $opts) = @_;

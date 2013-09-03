@@ -10,6 +10,7 @@ use JSV::Exception;
 
 sub instance_type { INSTANCE_TYPE_NUMERIC(); }
 sub keyword { "maximum" }
+sub keyword_priority { 10; }
 
 sub validate {
     my ($class, $validator, $schema, $instance, $opts) = @_;

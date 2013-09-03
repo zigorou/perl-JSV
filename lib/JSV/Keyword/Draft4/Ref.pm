@@ -9,6 +9,7 @@ use JSV::Keyword qw(:constants);
 
 sub instance_type { INSTANCE_TYPE_ANY(); }
 sub keyword { '$ref' }
+sub keyword_priority { 5; }
 
 sub validate {
     my ($class, $validator, $schema, $instance, $opts) = @_;

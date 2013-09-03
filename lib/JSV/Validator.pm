@@ -36,7 +36,10 @@ sub load_environments {
             INSTANCE_TYPE_OBJECT()  => [],
             INSTANCE_TYPE_ANY()     => [],
         };
-        my @keywords = $finder->plugins;
+        my @keywords = 
+            sort { $a->keyword_priority <=> $b->keyword_priority }
+            $finder->plugins;
+
         for my $keyword (@keywords) {
             my $type = $keyword->instance_type;
             push(@{$environment_keywords{$environment}{$type}}, $keyword);
