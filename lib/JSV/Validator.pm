@@ -89,6 +89,14 @@ sub validate {
     return $rv;
 }
 
+sub register_schema {
+    shift->{reference}->register_schema(@_);
+}
+
+sub unregister_schema {
+    shift->{reference}->unregister_schema(@_);
+}
+
 sub _validate {
     my ($self, $schema, $instance, $opts) = @_;
 
