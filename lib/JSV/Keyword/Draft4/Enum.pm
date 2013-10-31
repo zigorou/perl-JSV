@@ -8,7 +8,7 @@ use JSV::Keyword qw(:constants);
 use JSV::Exception;
 use JSV::Util::Type qw(detect_instance_type);
 use JSON;
-use List::Util qw(first);
+use List::MoreUtils qw(firstidx);
 
 sub instance_type { INSTANCE_TYPE_ANY(); }
 sub keyword { "enum" }
@@ -23,9 +23,9 @@ sub validate {
 
     my $enum = $class->keyword_value($schema);
     my $instance_as_json = $validator->json->encode($instance);
-    my $matched = first { $validator->json->encode($_) eq $instance_as_json } @$enum;
+    my $matched_idx = firstidx { $instance_as_json eq $validator->json->encode($_); } @$enum;
 
-    if (defined $matched) {
+    if ($matched_idx != -1) {
         return 1;
     }
     else {
