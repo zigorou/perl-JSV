@@ -1,6 +1,5 @@
 use strict;
 use warnings;
-use lib "t/lib";
 use Test::JSV::Suite;
 use JSON;
 use JSV::Validator;

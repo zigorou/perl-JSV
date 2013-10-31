@@ -14,6 +14,9 @@ requires 'Module::Pluggable::Object';
 requires 'Scalar::Util';
 requires 'URI';
 requires 'URI::Split';
+requires 'File::Basename';
+requires 'File::Spec';
+requires 'FindBin';
 
 on 'test' => sub {
     requires 'Test::More', '0.98';
