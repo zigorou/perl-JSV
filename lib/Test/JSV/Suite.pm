@@ -14,7 +14,7 @@ sub run {
     my ($class, %opts) = @_;
 
     %opts = (
-        base_dir => File::Spec->catdir(File::Spec->no_upwards(dirname(__FILE__), "../../../suite/tests")),
+        base_dir => File::Spec->catdir(File::Spec->no_upwards(dirname(__FILE__), "../../../t/suite/tests")),
         version  => "draft4",
         suite    => "type",
         cb       => sub {
