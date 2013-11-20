@@ -12,15 +12,9 @@ sub keyword { "minLength" }
 sub keyword_priority { 10; }
 
 sub validate {
-    my ($class, $validator, $schema, $instance, $opts) = @_;
+    my ($class, $context, $schema, $instance) = @_;
     return 1 unless $class->has_keyword($schema);
-
-    $opts         ||= {};
-    $class->initialize_args($schema, $instance, $opts);
-
-    unless ($opts->{type} eq "string") {
-        return 1;
-    }
+    return 1 unless $context->current_type eq "string";
 
     my $keyword_value = $class->keyword_value($schema);
 
@@ -30,7 +24,7 @@ sub validate {
     else {
         JSV::Exception->throw(
             "The instance length is less than minLength value",
-            $opts,
+            $context,
         );
     }
 }

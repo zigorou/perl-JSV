@@ -18,27 +18,25 @@ sub keyword { "type" }
 sub keyword_priority { 10; }
 
 sub validate {
-    my ($class, $validator, $schema, $instance, $opts) = @_;
+    my ($class, $context, $schema, $instance) = @_;
     return 1 unless $class->has_keyword($schema);
 
-    $opts ||= {};
-    $class->initialize_args($schema, $instance, $opts);
     my $keyword_value = $class->keyword_value($schema);
 
     if (ref $keyword_value eq "ARRAY") {
-        if ( first { $class->validate_singular_type( $_, $opts->{type} ) } @$keyword_value ) {
+        if ( first { $class->validate_singular_type( $_, $context->current_type ) } @$keyword_value ) {
             return 1;
         }
         else {
-            JSV::Exception->throw("instance type doesn't match schema type list", $opts);
+            JSV::Exception->throw("instance type doesn't match schema type list", $context);
         }
     }
     else {
-        if ($class->validate_singular_type( $keyword_value, $opts->{type} )) {
+        if ($class->validate_singular_type( $keyword_value, $context->current_type )) {
             return 1;
         }
         else {
-            JSV::Exception->throw("instance type doesn't match schema type", $opts);
+            JSV::Exception->throw("instance type doesn't match schema type", $context);
         }
     }
 }

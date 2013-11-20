@@ -15,15 +15,9 @@ sub keyword { "items" }
 sub keyword_priority { 10; }
 
 sub validate {
-    my ($class, $validator, $schema, $instance, $opts) = @_;
+    my ($class, $context, $schema, $instance) = @_;
     return 1 unless $class->has_keyword($schema);
-
-    $opts         ||= {};
-    $class->initialize_args($schema, $instance, $opts);
-
-    unless ($opts->{type} eq "array") {
-        return 1;
-    }
+    return 1 unless $context->current_type eq "array";
 
     my $items            = $class->keyword_value($schema);
     my $additional_items = $class->keyword_value($schema, "additionalItems");
@@ -33,71 +27,58 @@ sub validate {
 
     if ($items_type eq "object") { ### items as schema
         for (my $i = 0, my $l = scalar @$instance; $i < $l; $i++) {
-            push(@{$opts->{pointer_tokens}}, $i);
+            push(@{$context->pointer_tokens}, $i);
 
-            my $orig_type = $opts->{type};
-
-            $opts->{type}  = detect_instance_type($instance->[$i]);
-            $opts->{throw} = 1;
-
+            $context->throw_error(1);
             eval {
-                $validator->_validate($items, $instance->[$i], $opts);
+                $context->validate($items, $instance->[$i]);
             };
             if (my $e = $@) {
-                $opts->{throw} = 0;
+                $context->throw_error(0);
                 croak $e;
             }
 
-            pop(@{$opts->{pointer_tokens}});
-
-            $opts->{type} = $orig_type;
+            pop(@{$context->pointer_tokens});
         }
         return 1;
     }
     elsif ($items_type eq "array") { ### items as schema array
         for (my $i = 0, my $l = scalar @$instance; $i < $l; $i++) {
-            push(@{$opts->{pointer_tokens}}, $i);
-
-            my $orig_type = $opts->{type};
-
-            $opts->{type}  = detect_instance_type($instance->[$i]);
-            $opts->{throw} = 1;
+            push(@{$context->pointer_tokens}, $i);
 
             if (defined $items->[$i]) {
+                $context->throw_error(1);
                 eval {
-                    $validator->_validate($items->[$i], $instance->[$i], $opts);
+                    $context->validate($items->[$i], $instance->[$i]);
                 };
                 if (my $e = $@) {
-                    $opts->{throw} = 0;
+                    $context->throw_error(0);
                     croak $e;
                 }
             }
             elsif ($additional_items_type eq "object") {
                 eval {
-                    $validator->_validate($additional_items, $instance->[$i], $opts);
+                    $context->validate($additional_items, $instance->[$i]);
                 };
                 if (my $e = $@) {
-                    $opts->{throw} = 0;
+                    $context->throw_error(0);
                     croak $e;
                 }
             }
             elsif ($additional_items_type eq "boolean" && $additional_items == 0) {
-                $opts->{throw} = 0;
                 JSV::Exception->throw(
                     "The instance cannot have additional items",
-                    $opts,
+                    $context,
                 );
             }
 
-            pop(@{$opts->{pointer_tokens}});
-
-            $opts->{type} = $orig_type;
+            pop(@{$context->pointer_tokens});
          }
     }
     else { ### wrong schema
         JSV::Exception->throw(
             "Wrong schema definition",
-            $opts,
+            $context,
         );
     }
 }

@@ -10,10 +10,12 @@ use Class::Accessor::Lite (
 );
 
 sub throw {
-    my ($class, $message, $opts) = @_;
+    my ($class, $message, $context) = @_;
     my $exception = bless {
-        message => $message,
-        %$opts,
+        message        => $message,
+        pointer_tokens => $context->pointer_tokens,
+        type           => $context->current_type,
+        keyword        => $context->keyword,
     } => $class;
     croak $exception;
 }

@@ -13,15 +13,9 @@ sub keyword { "maximum" }
 sub keyword_priority { 10; }
 
 sub validate {
-    my ($class, $validator, $schema, $instance, $opts) = @_;
+    my ($class, $context, $schema, $instance) = @_;
     return 1 unless $class->has_keyword($schema);
-
-    $opts         ||= {};
-    $class->initialize_args($schema, $instance, $opts);
-
-    unless ($opts->{type} eq "number" || $opts->{type} eq "integer") {
-        return 1;
-    }
+    return 1 unless $context->current_type eq "number" || $context->current_type eq "integer";
 
     my $maximum           = $class->keyword_value($schema);
     my $exclusive_maximum = $class->keyword_value($schema, "exclusiveMaximum") || JSON::false;
@@ -33,7 +27,7 @@ sub validate {
         else {
             JSV::Exception->throw(
                 "The instance value is greater than maximum keyword value",
-                $opts,
+                $context,
             );
         }
     }
@@ -44,7 +38,7 @@ sub validate {
         else {
             JSV::Exception->throw(
                 "The instance value is greater than or equals maximum keyword value",
-                $opts,
+                $context,
             );
         }
     }

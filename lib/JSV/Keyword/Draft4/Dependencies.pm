@@ -14,15 +14,9 @@ sub keyword { "dependencies" }
 sub keyword_priority { 10; }
 
 sub validate {
-    my ($class, $validator, $schema, $instance, $opts) = @_;
-    return 1 unless ( $class->has_keyword($schema) );
-
-    $opts ||= {};
-    $class->initialize_args($schema, $instance, $opts);
-
-    unless ($opts->{type} eq "object") {
-        return 1;
-    }
+    my ($class, $context, $schema, $instance) = @_;
+    return 1 unless $class->has_keyword($schema);
+    return 1 unless $context->current_type eq "object";
 
     my $dependencies = $class->keyword_value($schema);
     $dependencies ||= {};
@@ -30,23 +24,19 @@ sub validate {
     for my $property (keys %$dependencies) {
         next unless (exists $instance->{$property});
 
-        local $opts->{pointer_tokens};
-        push(@{$opts->{pointer_tokens}}, $property);
+        push(@{$context->pointer_tokens}, $property);
 
         if (ref $dependencies->{$property} eq "ARRAY") {
             my $found_against_dependency = first { !exists $instance->{$_} } @{$dependencies->{$property}};
             if ($found_against_dependency) {
                 JSV::Exception->throw(
-                    sprintf("%s property has dependency on the %s field", $property, $found_against_dependency), 
-                    $opts,
+                    sprintf("%s property has dependency on the %s field", $property, $found_against_dependency),
+                    $context,
                 );
             }
         }
         elsif (ref $dependencies->{$property} eq "HASH") {
-            local $opts->{type}  = detect_instance_type($instance);
-            local $opts->{throw} = 1;
-
-            $validator->_validate($dependencies->{$property}, $instance, $opts);
+            $context->validate($dependencies->{$property}, $instance);
         }
     }
 

@@ -12,19 +12,13 @@ sub keyword { "allOf" }
 sub keyword_priority { 10; }
 
 sub validate {
-    my ($class, $validator, $schema, $instance, $opts) = @_;
+    my ($class, $context, $schema, $instance) = @_;
     return 1 unless $class->has_keyword($schema);
-
-    $opts         ||= {};
-    $class->initialize_args($schema, $instance, $opts);
 
     my $all_of = $class->keyword_value($schema);
 
     for my $sub_schema (@$all_of) {
-        local $opts->{type}  = detect_instance_type($instance);
-        local $opts->{throw} = 1;
-
-        $validator->_validate($sub_schema, $instance, $opts);
+        $context->validate($context, $sub_schema, $instance);
     }
 
     return 1;

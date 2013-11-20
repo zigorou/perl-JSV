@@ -14,21 +14,15 @@ sub keyword { "uniqueItems" }
 sub keyword_priority { 10; }
 
 sub validate {
-    my ($class, $validator, $schema, $instance, $opts) = @_;
+    my ($class, $context, $schema, $instance) = @_;
     return 1 unless $class->has_keyword($schema);
-
-    $opts         ||= {};
-    $class->initialize_args($schema, $instance, $opts);
-
-    unless ($opts->{type} eq "array") {
-        return 1;
-    }
+    return 1 unless $context->current_type eq "array";
 
     my $keyword_value = $class->keyword_value($schema);
 
     if ($keyword_value) {
         my @unique = uniq map {
-            $validator->json->encode($_)
+            $context->json->encode($_)
         } @$instance;
 
         if (scalar @unique == scalar @$instance) {
@@ -37,7 +31,7 @@ sub validate {
         else {
             JSV::Exception->throw(
                 "The instance array is not unique",
-                $opts,
+                $context,
             );
         }
     }

@@ -13,27 +13,21 @@ sub keyword { "oneOf" }
 sub keyword_priority { 10; }
 
 sub validate {
-    my ($class, $validator, $schema, $instance, $opts) = @_;
+    my ($class, $context, $schema, $instance) = @_;
     return 1 unless $class->has_keyword($schema);
-
-    $opts         ||= {};
-    $class->initialize_args($schema, $instance, $opts);
 
     my $one_of = $class->keyword_value($schema);
     my $valid_cnt = 0;
 
     for my $sub_schema (@$one_of) {
-        local $opts->{type}  = detect_instance_type($instance);
-        local $opts->{throw} = 0;
-
-        my $rv = $validator->_validate($sub_schema, $instance, $opts);
+        my $rv = $context->validate($sub_schema, $instance);
         $valid_cnt += $rv;
     }
 
     unless ($valid_cnt == 1) {
         JSV::Exception->throw(
             "The instance is not valid to one of schemas",
-            $opts,
+            $context,
         );
     }
 

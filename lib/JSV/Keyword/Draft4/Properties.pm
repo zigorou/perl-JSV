@@ -13,19 +13,14 @@ sub keyword { "properties" }
 sub keyword_priority { 10; }
 
 sub validate {
-    my ($class, $validator, $schema, $instance, $opts) = @_;
+    my ($class, $context, $schema, $instance) = @_;
+    return unless $context->current_type eq "object";
+
     unless (
-        $class->has_keyword($schema) || 
-        $class->has_keyword($schema, "additionalProperties") || 
+        $class->has_keyword($schema) ||
+        $class->has_keyword($schema, "additionalProperties") ||
         $class->has_keyword($schema, "patternProperties")
     ) {
-        return 1;
-    }
-
-    $opts         ||= {};
-    $class->initialize_args($schema, $instance, $opts);
-
-    unless ($opts->{type} eq "object") {
         return 1;
     }
 
@@ -45,26 +40,23 @@ sub validate {
     my $additional_properties = $class->keyword_value($schema, "additionalProperties");
     my $additional_properties_type = detect_instance_type($schema->{additionalProperties});
     my %s = map { $_ => undef } keys %$instance;
-    
+
     for my $property (keys %$instance) {
-        local $opts->{pointer_tokens};
-        push(@{$opts->{pointer_tokens}}, $property);
-        local $opts->{type}  = detect_instance_type($instance->{$property});
-        local $opts->{throw} = 1;
+        push(@{$context->pointer_tokens}, $property);
 
         if (exists $properties->{$property}) {
-            $validator->_validate($properties->{$property}, $instance->{$property}, $opts);
+            $context->validate($properties->{$property}, $instance->{$property});
             delete $s{$property};
         }
 
         for (my $i = 0, my $l = scalar(@patterns); $i < $l; $i++) {
             next unless ($property =~ m/$patterns[$i]/);
-            $validator->_validate($pattern_schemas[$i], $instance->{$property}, $opts);
+            $context->validate($pattern_schemas[$i], $instance->{$property});
             delete $s{$property};
         }
 
         if (exists $s{$property} && $additional_properties_type eq "object") {
-            $validator->_validate($additional_properties, $instance->{$property}, $opts);
+            $context->validate($additional_properties, $instance->{$property});
         }
     }
 
@@ -72,7 +64,7 @@ sub validate {
         if (keys %s > 0) {
             JSV::Exception->throw(
                 sprintf("Not allowed properties are existence (properties: %s)", join(", ", keys %s)),
-                $opts,
+                $context,
             );
         }
     }
