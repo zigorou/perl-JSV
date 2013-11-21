@@ -16,20 +16,13 @@ sub keyword_priority { 10; }
 
 sub validate {
     my ($class, $context, $schema, $instance) = @_;
-    return 1 unless $class->has_keyword($schema);
 
     my $enum = $class->keyword_value($schema);
     my $instance_as_json = $context->json->encode($instance);
     my $matched_idx = firstidx { $instance_as_json eq $context->json->encode($_); } @$enum;
 
-    if ($matched_idx != -1) {
-        return 1;
-    }
-    else {
-        JSV::Exception->throw(
-            sprintf("The instance value does not be included in the enum list"),
-            $context
-        );
+    if ($matched_idx == -1) {
+        $context->log_error("The instance value does not be included in the enum list");
     }
 }
 

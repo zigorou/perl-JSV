@@ -15,8 +15,6 @@ sub keyword_priority { 10; }
 
 sub validate {
     my ($class, $context, $schema, $instance) = @_;
-    return 1 unless $class->has_keyword($schema);
-    return 1 unless $context->current_type eq "array";
 
     my $keyword_value = $class->keyword_value($schema);
 
@@ -25,18 +23,9 @@ sub validate {
             $context->json->encode($_)
         } @$instance;
 
-        if (scalar @unique == scalar @$instance) {
-            return 1;
+        if (scalar @unique != scalar @$instance) {
+            $context->log_error("The instance array is not unique");
         }
-        else {
-            JSV::Exception->throw(
-                "The instance array is not unique",
-                $context,
-            );
-        }
-    }
-    else {
-        return 1;
     }
 }
 

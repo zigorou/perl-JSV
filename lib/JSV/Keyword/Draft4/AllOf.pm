@@ -13,15 +13,12 @@ sub keyword_priority { 10; }
 
 sub validate {
     my ($class, $context, $schema, $instance) = @_;
-    return 1 unless $class->has_keyword($schema);
 
     my $all_of = $class->keyword_value($schema);
 
     for my $sub_schema (@$all_of) {
         $context->validate($context, $sub_schema, $instance);
     }
-
-    return 1;
 }
 
 1;

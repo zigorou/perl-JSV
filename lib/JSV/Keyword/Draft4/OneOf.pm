@@ -14,7 +14,6 @@ sub keyword_priority { 10; }
 
 sub validate {
     my ($class, $context, $schema, $instance) = @_;
-    return 1 unless $class->has_keyword($schema);
 
     my $one_of = $class->keyword_value($schema);
     my $valid_cnt = 0;
@@ -25,13 +24,8 @@ sub validate {
     }
 
     unless ($valid_cnt == 1) {
-        JSV::Exception->throw(
-            "The instance is not valid to one of schemas",
-            $context,
-        );
+        $context->log_error("The instance is not valid to one of schemas");
     }
-
-    return 1;
 }
 
 1;

@@ -13,7 +13,6 @@ sub keyword_priority { 5; }
 
 sub validate {
     my ($class, $context, $schema, $instance) = @_;
-    return 1 unless $class->has_keyword($schema);
 
     my $rv = $context->reference->resolve(
         $schema,

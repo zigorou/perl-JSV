@@ -73,11 +73,10 @@ sub validate {
         reference              => $self->reference,
         environment            => $self->environment,
         environment_keywords   => \%environment_keywords,
-        current_type           => undef,
         original_schema        => $schema,
         resolved_schema        => undef,
-        throw                  => $self->throw_error,
-        last_exception         => undef,
+        throw_error            => $self->throw_error,
+        errors                 => [],
         pointer_tokens         => [],
     );
 

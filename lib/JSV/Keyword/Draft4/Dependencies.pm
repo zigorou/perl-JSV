@@ -15,8 +15,6 @@ sub keyword_priority { 10; }
 
 sub validate {
     my ($class, $context, $schema, $instance) = @_;
-    return 1 unless $class->has_keyword($schema);
-    return 1 unless $context->current_type eq "object";
 
     my $dependencies = $class->keyword_value($schema);
     $dependencies ||= {};
@@ -29,18 +27,15 @@ sub validate {
         if (ref $dependencies->{$property} eq "ARRAY") {
             my $found_against_dependency = first { !exists $instance->{$_} } @{$dependencies->{$property}};
             if ($found_against_dependency) {
-                JSV::Exception->throw(
-                    sprintf("%s property has dependency on the %s field", $property, $found_against_dependency),
-                    $context,
-                );
+                $context->log_error(sprintf("%s property has dependency on the %s field", $property, $found_against_dependency));
             }
         }
         elsif (ref $dependencies->{$property} eq "HASH") {
             $context->validate($dependencies->{$property}, $instance);
         }
-    }
 
-    return 1;
+        pop(@{$context->pointer_tokens});
+    }
 }
 
 1;
