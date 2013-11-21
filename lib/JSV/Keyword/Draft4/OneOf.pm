@@ -19,12 +19,13 @@ sub validate {
     my $valid_cnt = 0;
 
     for my $sub_schema (@$one_of) {
-        my $rv = $context->validate($sub_schema, $instance);
-        $valid_cnt += $rv;
+        local $context->{errors} = [];
+        $context->validate($sub_schema, $instance);
+        $valid_cnt += 1 unless scalar @{ $context->{errors} };
     }
 
     unless ($valid_cnt == 1) {
-        $context->log_error("The instance is not valid to one of schemas");
+        $context->log_error("The instance is not matched to one of schemas");
     }
 }
 

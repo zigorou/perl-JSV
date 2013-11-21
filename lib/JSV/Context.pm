@@ -24,7 +24,7 @@ use Class::Accessor::Lite (
     /],
 );
 
-use Scope::Guard qw(guard);
+use JSON::XS;
 use JSV::Keyword qw(:constants);
 use JSV::Util::Type qw(detect_instance_type);
 
@@ -85,6 +85,7 @@ sub validate {
 sub apply_keyword {
     my ($self, $keyword, $schema, $instance) = @_;
 
+    local $self->{current_errors}   = [];
     local $self->{current_keyword}  = $_->keyword;
     local $self->{current_schema}   = $schema;
     local $self->{current_instance} = $instance;
@@ -95,13 +96,33 @@ sub apply_keyword {
 sub log_error {
     my ($self, $message) = @_;
 
-    push @{ $self->{errors} }, +{
+    my $instance;
+    if ( ref $self->current_instance ) {
+        if ( $self->current_instance == JSON::XS::true ) {
+            $instance = "true";
+        }
+        elsif ( $self->current_instance == JSON::XS::false ) {
+            $instance = "false";
+        }
+    }
+    else {
+        $instance = $self->current_instance;
+    }
+
+    my $error = +{
         keyword  => $self->current_keyword,
-        pointer  => join "/", @{ $self->pointer_tokens },
+        pointer  => (join "/", @{ $self->pointer_tokens }),
         schema   => $self->current_schema,
-        instance => $self->current_instance,
+        instance => $instance,
         message  => $message,
     };
+
+    if ( $ENV{JSV_DEBUG} ) {
+        use Data::Dump qw/dump/;
+        warn dump($error);
+    }
+
+    push @{ $self->{errors} }, $error;
 }
 
 1;

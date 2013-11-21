@@ -19,8 +19,9 @@ sub validate {
     my $valid_cnt = 0;
 
     for my $sub_schema (@$any_of) {
-        my $rv = $context->validate($sub_schema, $instance);
-        $valid_cnt += $rv;
+        local $context->{errors} = [];
+        $context->validate($sub_schema, $instance);
+        $valid_cnt += 1 unless scalar @{ $context->{errors} };
     }
 
     if ($valid_cnt == 0) {

@@ -52,6 +52,7 @@ sub new {
     my %args  = @_;
     %args = (
         environment => 'draft4',
+        reference   => JSV::Reference->new,
         %args,
     );
 

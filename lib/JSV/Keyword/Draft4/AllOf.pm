@@ -17,7 +17,7 @@ sub validate {
     my $all_of = $class->keyword_value($schema);
 
     for my $sub_schema (@$all_of) {
-        $context->validate($context, $sub_schema, $instance);
+        $context->validate($sub_schema, $instance);
     }
 }
 

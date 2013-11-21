@@ -16,7 +16,7 @@ sub validate {
 
     my $keyword_value = $class->keyword_value($schema);
 
-    if (length($instance) > $keyword_value) {
+    if (length($instance) < $keyword_value) {
         $context->log_error("The instance length is less than minLength value");
     }
 }

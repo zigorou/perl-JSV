@@ -14,12 +14,11 @@ sub keyword_priority { 10; }
 
 sub validate {
     my ($class, $context, $schema, $instance) = @_;
-    return unless $context->current_type eq "object";
 
     unless (
-        $class->has_keyword($schema) ||
-        $class->has_keyword($schema, "additionalProperties") ||
-        $class->has_keyword($schema, "patternProperties")
+        $schema->{$class->keyword} ||
+        $schema->{"additionalProperties"} ||
+        $schema->{"patternProperties"}
     ) {
         return 1;
     }
@@ -58,6 +57,8 @@ sub validate {
         if (exists $s{$property} && $additional_properties_type eq "object") {
             $context->validate($additional_properties, $instance->{$property});
         }
+
+        pop(@{$context->pointer_tokens});
     }
 
     if ($additional_properties_type eq "boolean" && !$additional_properties) {
@@ -65,8 +66,6 @@ sub validate {
             $context->log_error("Not allowed properties are existence (properties: %s)", join(", ", keys %s));
         }
     }
-
-    return 1;
 }
 
 1;
