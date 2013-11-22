@@ -4,8 +4,7 @@ use strict;
 use warnings;
 use parent qw(JSV::Keyword);
 
-use Carp;
-use JSON::XS;
+use JSON;
 
 use JSV::Keyword qw(:constants);
 use JSV::Util::Type qw(detect_instance_type);
