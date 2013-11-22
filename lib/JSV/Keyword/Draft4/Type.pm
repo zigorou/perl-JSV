@@ -9,36 +9,26 @@ use JSON;
 use List::Util qw(first);
 use Scalar::Util qw(blessed);
 
-use JSV::Exception;
 use JSV::Keyword qw(:constants);
 use JSV::Util::Type qw(detect_instance_type);
 
-sub instance_type { INSTANCE_TYPE_ANY(); }
-sub keyword { "type" }
-sub keyword_priority { 10; }
+sub instance_type() { INSTANCE_TYPE_ANY(); }
+sub keyword() { "type" }
+sub keyword_priority() { 10; }
 
 sub validate {
-    my ($class, $validator, $schema, $instance, $opts) = @_;
-    return 1 unless $class->has_keyword($schema);
+    my ($class, $context, $schema, $instance) = @_;
 
-    $opts ||= {};
-    $class->initialize_args($schema, $instance, $opts);
     my $keyword_value = $class->keyword_value($schema);
 
     if (ref $keyword_value eq "ARRAY") {
-        if ( first { $class->validate_singular_type( $_, $opts->{type} ) } @$keyword_value ) {
-            return 1;
-        }
-        else {
-            JSV::Exception->throw("instance type doesn't match schema type list", $opts);
+        unless ( first { $class->validate_singular_type( $_, $context->current_type ) } @$keyword_value ) {
+            $context->log_error("instance type doesn't match schema type list");
         }
     }
     else {
-        if ($class->validate_singular_type( $keyword_value, $opts->{type} )) {
-            return 1;
-        }
-        else {
-            JSV::Exception->throw("instance type doesn't match schema type", $opts);
+        unless ($class->validate_singular_type( $keyword_value, $context->current_type )) {
+            $context->log_error("instance type doesn't match schema type");
         }
     }
 }

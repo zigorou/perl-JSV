@@ -5,13 +5,20 @@ use warnings;
 
 use Class::Accessor::Lite (
     new => 0,
-    rw  => [qw/json reference last_exception resolved_schema/]
+    rw  => [qw/
+        reference
+        environment
+        environment_keywords
+        enable_history
+        throw_error
+        throw_immediate
+    /]
 );
 use Clone qw(clone);
 use JSON;
 use JSV::Keyword qw(:constants);
-use JSV::Util::Type qw(detect_instance_type);
 use JSV::Reference;
+use JSV::Context;
 use Module::Pluggable::Object;
 
 my %supported_environments = (
@@ -36,7 +43,7 @@ sub load_environments {
             INSTANCE_TYPE_OBJECT()  => [],
             INSTANCE_TYPE_ANY()     => [],
         };
-        my @keywords = 
+        my @keywords =
             sort { $a->keyword_priority <=> $b->keyword_priority }
             $finder->plugins;
 
@@ -51,7 +58,9 @@ sub new {
     my $class = shift;
     my %args  = @_;
     %args = (
-        environment => 'draft4',
+        environment    => 'draft4',
+        enable_history => 0,
+        reference      => JSV::Reference->new,
         %args,
     );
 
@@ -61,10 +70,7 @@ sub new {
     }
 
     bless {
-        last_exception => undef,
-        resolved_schema => undef,
-        json           => JSON->new->allow_nonref,
-        reference      => JSV::Reference->new,
+        environment_keywords => \%environment_keywords,
         %args,
     } => $class;
 }
@@ -72,91 +78,40 @@ sub new {
 sub validate {
     my ($self, $schema, $instance) = @_;
 
-    my $cloned_schema = clone($schema);
-    my $opts = +{
-        type => detect_instance_type($instance),
-        schema => $cloned_schema,
-        throw          => 0,
-        pointer_tokens => [],
-    };
+    my $context = JSV::Context->new(
+        keywords               => +{
+            INSTANCE_TYPE_ANY()     => $self->instance_type_keywords(INSTANCE_TYPE_ANY),
+            INSTANCE_TYPE_NUMERIC() => $self->instance_type_keywords(INSTANCE_TYPE_NUMERIC),
+            INSTANCE_TYPE_STRING()  => $self->instance_type_keywords(INSTANCE_TYPE_STRING),
+            INSTANCE_TYPE_ARRAY()   => $self->instance_type_keywords(INSTANCE_TYPE_ARRAY),
+            INSTANCE_TYPE_OBJECT()  => $self->instance_type_keywords(INSTANCE_TYPE_OBJECT),
+        },
+        reference       => $self->reference,
+        environment     => $self->environment,
+        original_schema => $schema,
+        throw_error     => $self->throw_error,
+        throw_immediate => $self->throw_immediate,
+        enable_history  => $self->enable_history,
+        history         => [],
+        errors          => [],
+        current_pointer => "",
+        json            => JSON->new->allow_nonref,
+    );
 
-    my $rv;
-    $self->{last_exception} = undef;
-    $self->{resolved_schema} = undef;
-    $rv = $self->_validate($cloned_schema, $instance, $opts);
-    $self->{resolved_schema} = $cloned_schema;
+    return $context->validate($schema, $instance);
+}
 
-    return $rv;
+sub instance_type_keywords {
+    my ($self, $instance_type) = @_;
+    return $self->environment_keywords->{$self->environment}{$instance_type};
 }
 
 sub register_schema {
-    shift->{reference}->register_schema(@_);
+    shift->reference->register_schema(@_);
 }
 
 sub unregister_schema {
-    shift->{reference}->unregister_schema(@_);
-}
-
-sub _validate {
-    my ($self, $schema, $instance, $opts) = @_;
-
-    $opts ||= {};
-    %$opts = (
-        exists $opts->{type} ? () : (
-            type => detect_instance_type($instance)
-        ),
-        exists $opts->{schema} ? () : (
-            schema => $schema
-        ),
-        throw          => 1,
-        pointer_tokens => [],
-        %$opts,
-    );
-
-    my $rv;
-
-    eval {
-        for ($self->_instance_type_keywords(INSTANCE_TYPE_ANY)) {
-            $_->validate($self, $schema, $instance, $opts);
-        }
-
-        if ($opts->{type} eq "integer" || $opts->{type} eq "number") {
-            for ($self->_instance_type_keywords(INSTANCE_TYPE_NUMERIC)) {
-                $_->validate($self, $schema, $instance, $opts);
-            }
-        }
-        elsif ($opts->{type} eq "string") {
-            for ($self->_instance_type_keywords(INSTANCE_TYPE_STRING)) {
-                $_->validate($self, $schema, $instance, $opts);
-            }
-        }
-        elsif ($opts->{type} eq "array") {
-            for ($self->_instance_type_keywords(INSTANCE_TYPE_ARRAY)) {
-                $_->validate($self, $schema, $instance, $opts);
-            }
-        }
-        elsif ($opts->{type} eq "object") {
-            for ($self->_instance_type_keywords(INSTANCE_TYPE_OBJECT)) {
-                $_->validate($self, $schema, $instance, $opts);
-            }
-        }
-
-        $rv = 1;
-    };
-    if (my $e = $@) {
-        $self->last_exception($e);
-        if ($opts->{throw}) {
-            croak $e;
-        }
-        $rv = 0;
-    }
-
-    return $rv;
-}
-
-sub _instance_type_keywords {
-    my ($self, $instance_type) = @_;
-    return @{$environment_keywords{$self->{environment}}{$instance_type}};
+    shift->reference->unregister_schema(@_);
 }
 
 1;

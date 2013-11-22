@@ -5,25 +5,17 @@ use warnings;
 use parent qw(JSV::Keyword);
 
 use Carp;
+use JSON::XS;
 
 use JSV::Keyword qw(:constants);
-use JSV::Exception;
 use JSV::Util::Type qw(detect_instance_type);
 
-sub instance_type { INSTANCE_TYPE_ARRAY(); }
-sub keyword { "items" }
-sub keyword_priority { 10; }
+sub instance_type() { INSTANCE_TYPE_ARRAY(); }
+sub keyword() { "items" }
+sub keyword_priority() { 10; }
 
 sub validate {
-    my ($class, $validator, $schema, $instance, $opts) = @_;
-    return 1 unless $class->has_keyword($schema);
-
-    $opts         ||= {};
-    $class->initialize_args($schema, $instance, $opts);
-
-    unless ($opts->{type} eq "array") {
-        return 1;
-    }
+    my ($class, $context, $schema, $instance) = @_;
 
     my $items            = $class->keyword_value($schema);
     my $additional_items = $class->keyword_value($schema, "additionalItems");
@@ -33,72 +25,27 @@ sub validate {
 
     if ($items_type eq "object") { ### items as schema
         for (my $i = 0, my $l = scalar @$instance; $i < $l; $i++) {
-            push(@{$opts->{pointer_tokens}}, $i);
-
-            my $orig_type = $opts->{type};
-
-            $opts->{type}  = detect_instance_type($instance->[$i]);
-            $opts->{throw} = 1;
-
-            eval {
-                $validator->_validate($items, $instance->[$i], $opts);
-            };
-            if (my $e = $@) {
-                $opts->{throw} = 0;
-                croak $e;
-            }
-
-            pop(@{$opts->{pointer_tokens}});
-
-            $opts->{type} = $orig_type;
+            local $context->{current_pointer} .= "/" . $i;
+            $context->validate($items, $instance->[$i]);
         }
-        return 1;
     }
     elsif ($items_type eq "array") { ### items as schema array
         for (my $i = 0, my $l = scalar @$instance; $i < $l; $i++) {
-            push(@{$opts->{pointer_tokens}}, $i);
-
-            my $orig_type = $opts->{type};
-
-            $opts->{type}  = detect_instance_type($instance->[$i]);
-            $opts->{throw} = 1;
+            local $context->{current_pointer} .= "/" . $i;
 
             if (defined $items->[$i]) {
-                eval {
-                    $validator->_validate($items->[$i], $instance->[$i], $opts);
-                };
-                if (my $e = $@) {
-                    $opts->{throw} = 0;
-                    croak $e;
-                }
+                $context->validate($items->[$i], $instance->[$i]);
             }
             elsif ($additional_items_type eq "object") {
-                eval {
-                    $validator->_validate($additional_items, $instance->[$i], $opts);
-                };
-                if (my $e = $@) {
-                    $opts->{throw} = 0;
-                    croak $e;
-                }
+                $context->validate($additional_items, $instance->[$i]);
             }
-            elsif ($additional_items_type eq "boolean" && $additional_items == 0) {
-                $opts->{throw} = 0;
-                JSV::Exception->throw(
-                    "The instance cannot have additional items",
-                    $opts,
-                );
+            elsif ($additional_items_type eq "boolean" && $additional_items == JSON::false) {
+                $context->log_error("additionalItems are now allowed");
             }
-
-            pop(@{$opts->{pointer_tokens}});
-
-            $opts->{type} = $orig_type;
          }
     }
     else { ### wrong schema
-        JSV::Exception->throw(
-            "Wrong schema definition",
-            $opts,
-        );
+        $context->log_error("Wrong schema definition");
     }
 }
 

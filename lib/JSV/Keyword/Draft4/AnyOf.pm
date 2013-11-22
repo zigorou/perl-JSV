@@ -6,38 +6,26 @@ use parent qw(JSV::Keyword);
 
 use JSV::Keyword qw(:constants);
 use JSV::Util::Type qw(detect_instance_type);
-use JSV::Exception;
 
-sub instance_type { INSTANCE_TYPE_ANY(); }
-sub keyword { "anyOf" }
-sub keyword_priority { 10; }
+sub instance_type() { INSTANCE_TYPE_ANY(); }
+sub keyword() { "anyOf" }
+sub keyword_priority() { 10; }
 
 sub validate {
-    my ($class, $validator, $schema, $instance, $opts) = @_;
-    return 1 unless $class->has_keyword($schema);
-
-    $opts         ||= {};
-    $class->initialize_args($schema, $instance, $opts);
+    my ($class, $context, $schema, $instance) = @_;
 
     my $any_of = $class->keyword_value($schema);
     my $valid_cnt = 0;
 
     for my $sub_schema (@$any_of) {
-        local $opts->{type}  = detect_instance_type($instance);
-        local $opts->{throw} = 0;
-
-        my $rv = $validator->_validate($sub_schema, $instance, $opts);
-        $valid_cnt += $rv;
+        local $context->{errors} = [];
+        $context->validate($sub_schema, $instance);
+        $valid_cnt += 1 unless scalar @{ $context->{errors} };
     }
 
     if ($valid_cnt == 0) {
-        JSV::Exception->throw(
-            "The instance is not valid to any of schemas",
-            $opts,
-        );
+        $context->log_error("The instance is not valid to any of schemas");
     }
-
-    return 1;
 }
 
 1;
