@@ -13,9 +13,9 @@ use JSV::Exception;
 use JSV::Keyword qw(:constants);
 use JSV::Util::Type qw(detect_instance_type);
 
-sub instance_type { INSTANCE_TYPE_ANY(); }
-sub keyword { "type" }
-sub keyword_priority { 10; }
+sub instance_type() { INSTANCE_TYPE_ANY(); }
+sub keyword() { "type" }
+sub keyword_priority() { 10; }
 
 sub validate {
     my ($class, $context, $schema, $instance) = @_;

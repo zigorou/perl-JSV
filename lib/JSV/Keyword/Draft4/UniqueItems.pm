@@ -9,9 +9,9 @@ use List::MoreUtils qw(uniq);
 use JSV::Exception;
 use JSV::Keyword qw(:constants);
 
-sub instance_type { INSTANCE_TYPE_ARRAY(); }
-sub keyword { "uniqueItems" }
-sub keyword_priority { 10; }
+sub instance_type() { INSTANCE_TYPE_ARRAY(); }
+sub keyword() { "uniqueItems" }
+sub keyword_priority() { 10; }
 
 sub validate {
     my ($class, $context, $schema, $instance) = @_;

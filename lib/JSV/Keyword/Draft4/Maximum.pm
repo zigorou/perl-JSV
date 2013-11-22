@@ -8,9 +8,9 @@ use JSON;
 use JSV::Keyword qw(:constants);
 use JSV::Exception;
 
-sub instance_type { INSTANCE_TYPE_NUMERIC(); }
-sub keyword { "maximum" }
-sub keyword_priority { 10; }
+sub instance_type() { INSTANCE_TYPE_NUMERIC(); }
+sub keyword() { "maximum" }
+sub keyword_priority() { 10; }
 
 sub validate {
     my ($class, $context, $schema, $instance) = @_;

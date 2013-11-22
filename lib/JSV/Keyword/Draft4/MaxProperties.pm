@@ -5,9 +5,9 @@ use warnings;
 use parent qw(JSV::Keyword);
 use JSV::Keyword qw(:constants);
 
-sub instance_type { INSTANCE_TYPE_OBJECT(); }
-sub keyword { "maxProperties" }
-sub keyword_priority { 10; }
+sub instance_type() { INSTANCE_TYPE_OBJECT(); }
+sub keyword() { "maxProperties" }
+sub keyword_priority() { 10; }
 
 sub validate {
     my ($class, $context, $schema, $instance) = @_;
