@@ -100,7 +100,7 @@ sub apply_keyword {
             keyword  => $self->current_keyword,
             pointer  => $self->current_pointer,
             schema   => $self->current_schema,
-            instance => $instance,
+            instance => $self->resolve_current_instance,
         };
     }
 }
@@ -108,24 +108,11 @@ sub apply_keyword {
 sub log_error {
     my ($self, $message) = @_;
 
-    my $instance;
-    if ( ref $self->current_instance ) {
-        if ( $self->current_instance == JSON::true ) {
-            $instance = "true";
-        }
-        elsif ( $self->current_instance == JSON::false ) {
-            $instance = "false";
-        }
-    }
-    else {
-        $instance = $self->current_instance;
-    }
-
     my $error = +{
         keyword  => $self->current_keyword,
         pointer  => $self->current_pointer,
         schema   => $self->current_schema,
-        instance => $instance,
+        instance => $self->resolve_current_instance,
         message  => $message,
     };
 
@@ -144,6 +131,25 @@ sub log_error {
     else {
         push @{ $self->{errors} }, $error;
     }
+}
+
+sub resolve_current_instance {
+    my $self = shift;
+
+    my $instance;
+    if ( ref $self->current_instance ) {
+        if ( $self->current_instance == JSON::true ) {
+            $instance = "true";
+        }
+        elsif ( $self->current_instance == JSON::false ) {
+            $instance = "false";
+        }
+    }
+    else {
+        $instance = $self->current_instance;
+    }
+
+    return $instance;
 }
 
 1;
