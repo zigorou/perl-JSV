@@ -10,6 +10,7 @@ use Class::Accessor::Lite (
         reference
         original_schema
         throw_error
+        throw_immediate
         pointer_tokens
         history
         enable_history
@@ -128,7 +129,12 @@ sub log_error {
         warn dump($error);
     }
 
-    push @{ $self->{errors} }, $error;
+    if ( $self->throw_immediate ) {
+        croak $error;
+    }
+    else {
+        push @{ $self->{errors} }, $error;
+    }
 }
 
 1;

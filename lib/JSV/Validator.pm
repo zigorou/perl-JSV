@@ -5,7 +5,14 @@ use warnings;
 
 use Class::Accessor::Lite (
     new => 0,
-    rw  => [qw/reference environment environment_keywords enable_history throw_error/]
+    rw  => [qw/
+        reference
+        environment
+        environment_keywords
+        enable_history
+        throw_error
+        throw_immediate
+    /]
 );
 use Clone qw(clone);
 use JSON;
@@ -79,15 +86,16 @@ sub validate {
             INSTANCE_TYPE_ARRAY()   => $self->instance_type_keywords(INSTANCE_TYPE_ARRAY),
             INSTANCE_TYPE_OBJECT()  => $self->instance_type_keywords(INSTANCE_TYPE_OBJECT),
         },
-        reference              => $self->reference,
-        environment            => $self->environment,
-        original_schema        => $schema,
-        throw_error            => $self->throw_error,
-        enable_history         => $self->enable_history,
-        history                => [],
-        errors                 => [],
-        pointer_tokens         => [],
-        json                   => JSON->new->allow_nonref,
+        reference       => $self->reference,
+        environment     => $self->environment,
+        original_schema => $schema,
+        throw_error     => $self->throw_error,
+        throw_immediate => $self->throw_immediate,
+        enable_history  => $self->enable_history,
+        history         => [],
+        errors          => [],
+        pointer_tokens  => [],
+        json            => JSON->new->allow_nonref,
     );
 
     return $context->validate($schema, $instance);
