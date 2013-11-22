@@ -11,6 +11,8 @@ use Class::Accessor::Lite (
         original_schema
         throw_error
         pointer_tokens
+        history
+        enable_history
         json
     /],
     ro  => [qw/
@@ -84,6 +86,15 @@ sub apply_keyword {
     local $self->{current_schema}   = $schema;
     local $self->{current_instance} = $instance;
 
+    if ( $self->enable_history ) {
+        push @{ $self->history }, +{
+            keyword  => $self->current_keyword,
+            pointer  => (join "/", @{ $self->pointer_tokens }),
+            schema   => $self->current_schema,
+            instance => $instance,
+        };
+    }
+
     $_->validate($self, $schema, $instance);
 }
 
@@ -113,6 +124,7 @@ sub log_error {
 
     if ( $ENV{JSV_DEBUG} ) {
         use Data::Dump qw/dump/;
+        warn dump($self->history);
         warn dump($error);
     }
 

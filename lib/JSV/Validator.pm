@@ -5,7 +5,7 @@ use warnings;
 
 use Class::Accessor::Lite (
     new => 0,
-    rw  => [qw/reference environment environment_keywords throw_error/]
+    rw  => [qw/reference environment environment_keywords enable_history throw_error/]
 );
 use Clone qw(clone);
 use JSON;
@@ -51,8 +51,9 @@ sub new {
     my $class = shift;
     my %args  = @_;
     %args = (
-        environment => 'draft4',
-        reference   => JSV::Reference->new,
+        environment    => 'draft4',
+        enable_history => 0,
+        reference      => JSV::Reference->new,
         %args,
     );
 
@@ -82,6 +83,8 @@ sub validate {
         environment            => $self->environment,
         original_schema        => $schema,
         throw_error            => $self->throw_error,
+        enable_history         => $self->enable_history,
+        history                => [],
         errors                 => [],
         pointer_tokens         => [],
         json                   => JSON->new->allow_nonref,
