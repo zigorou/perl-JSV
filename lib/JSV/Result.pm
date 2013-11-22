@@ -1,17 +1,24 @@
-package JSV::Exception;
+package JSV::Result;
 
 use strict;
 use warnings;
+use overload
+    'bool' => \&to_boolean,
+    'eq'   => \&equals;
 
 use Carp;
 use Class::Accessor::Lite (
     new => 1,
-    rw  => [qw/error errors history/]
+    rw  => [qw/instance error errors history/]
 );
 
-sub throw {
-    my ($class, %args) = @_;
-    croak $class->new(%args);
+sub equals {
+    $_[0]->to_boolean == $_[1];
+}
+
+sub to_boolean {
+    my $self = shift;
+    return (($self->errors && scalar @{ $self->errors }) || $self->error) ? 0 : 1;
 }
 
 sub get_error {

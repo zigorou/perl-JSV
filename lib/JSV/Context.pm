@@ -25,10 +25,11 @@ use Class::Accessor::Lite (
     /],
 );
 
-use JSON::XS;
+use Carp qw(croak);
+use JSON;
 use JSV::Keyword qw(:constants);
 use JSV::Util::Type qw(detect_instance_type);
-use JSV::Exception;
+use JSV::Result;
 
 
 sub validate {
@@ -68,16 +69,18 @@ sub validate {
             }
         }
 
-        $rv = 1;
+        $rv = JSV::Result->new(
+            ($self->enable_history ? (history => $self->history) : ()),
+        );
     };
     if ( scalar @{ $self->errors } ) {
+        $rv = JSV::Result->new(
+            errors => $self->errors,
+            ($self->enable_history ? (history => $self->history) : ()),
+        );
         if ( $self->throw_error ) {
-            JSV::Exception->throw(
-                errors => $self->errors,
-                ($self->enable_history ? (history => $self->history) : ()),
-            );
+            croak $rv;
         }
-        $rv = 0;
     }
 
     return $rv;
@@ -108,10 +111,10 @@ sub log_error {
 
     my $instance;
     if ( ref $self->current_instance ) {
-        if ( $self->current_instance == JSON::XS::true ) {
+        if ( $self->current_instance == JSON::true ) {
             $instance = "true";
         }
-        elsif ( $self->current_instance == JSON::XS::false ) {
+        elsif ( $self->current_instance == JSON::false ) {
             $instance = "false";
         }
     }
@@ -134,7 +137,7 @@ sub log_error {
     }
 
     if ( $self->throw_immediate ) {
-        JSV::Exception->throw(
+        croak JSV::Result->new(
             error => $error,
             ($self->enable_history ? (history => $self->history) : ()),
         );
