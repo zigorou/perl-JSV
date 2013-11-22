@@ -4,6 +4,10 @@ use strict;
 use warnings;
 use parent qw(JSV::Keyword);
 
+use Data::Validate::Domain qw(is_domain);
+use Data::Validate::IP qw(is_ipv4 is_ipv6);
+use Data::Validate::URI qw(is_uri);
+use Email::Valid::Loose;
 use JSV::Keyword qw(:constants);
 use JSV::Exception;
 
@@ -30,53 +34,25 @@ sub validate {
             JSV::Exception->throw("format isn`t date-time", $opts);
         }
     } elsif ($keyword_value eq 'uri') {
-        # RFC3986
-        my $regex = qr/
-        \A
-        (
-            [a-z][a-z0-9+\-.]*:
-            (
-                \/\/
-                ([a-z0-9\-._~%!\$&'()*+,;=]+@)?
-                ([a-z0-9\-._~%]+
-                |\[[a-f0-9:.]+\]
-                |\[v[a-f0-9][a-z0-9\-._~%!\$&'()*+,;=:]+\])
-                (:[0-9]+)?
-                (\/[a-z0-9\-._~%!\$&'()*+,;=:@]+)*\/? # パス
-            |
-                (\/?[a-z0-9\-._~%!\$&'()*+,;=:@]+(\/[a-z0-9\-._~%!\$&'()*+,;=:@]+)*\/?)?
-            )
-        |
-            (
-                [a-z0-9\-._~%!\$&'()*+,;=@]+(\/[a-z0-9\-._~%!\$&'()*+,;=:@]+)*\/?
-            |
-                (\/[a-z0-9\-._~%!\$&'()*+,;=:@]+)+\/?
-            )
-        )
-        (\?[a-z0-9\-._~%!\$&'()*+,;=:@\/?]*)?
-        (\#[a-z0-9\-._~%!\$&'()*+,;=:@\/?]*)?
-        \Z
-        /x;
-
-        unless ($instance =~ /$regex/) {
+        unless (is_uri($instance)) {
             JSV::Exception->throw("format isn`t uri", $opts);
         }
 
     } elsif ($keyword_value eq 'email') {
-        unless ($instance =~ /\A[A-Z0-9+_.-]+@[A-Z0-9+_.-]+\Z/i) {
+        # TODO: enable change to Email::Valid or Email::Valid::Loose
+        unless (Email::Valid::Loose->address($instance)) {
             JSV::Exception->throw("format isn`t email", $opts);
         }
     } elsif ($keyword_value eq 'ipv4') {
-        unless ($instance =~ /\A(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\Z/) {
+        unless (is_ipv4($instance)) {
             JSV::Exception->throw("format isn`t ipv4", $opts);
         }
     } elsif ($keyword_value eq 'ipv6') {
-        my $regex = qr/\A(((?=(?>.*?::)(?!.*::)))(::)?([0-9A-F]{1,4}::?){0,5}|([0-9A-F]{1,4}:){6})(\2([0-9A-F]{1,4}(::?|$)){0,2}|((25[0-5]|(2[0-4]|1[0-9]|[1-9])?[0-9])(\.|$)){4}|[0-9A-F]{1,4}:[0-9A-F]{1,4})(?<![^:]:)(?<!\.)\z/i;
-        unless ($instance =~ /$regex/) {
+        unless (is_ipv6($instance)) {
             JSV::Exception->throw("format isn`t ipv6", $opts);
         }
     } elsif ($keyword_value eq 'hostname') {
-        unless ($instance =~ /\A((?=[a-z0-9-]{1,63}\.)(xn--)?[a-z0-9]+(-[a-z0-9]+)*\.)+[a-z]{2,63}\Z/) {
+        unless (is_domain($instance)) {
             JSV::Exception->throw("format isn`t hostname", $opts);
         }
     } else {
