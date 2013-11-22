@@ -11,8 +11,8 @@ use Class::Accessor::Lite (
         original_schema
         throw_error
         throw_immediate
-        history
         enable_history
+        history
         json
     /],
     ro  => [qw/
@@ -89,12 +89,13 @@ sub validate {
 sub apply_keyword {
     my ($self, $keyword, $schema, $instance) = @_;
 
-    local $self->{current_errors}   = [];
     local $self->{current_keyword}  = $_->keyword;
     local $self->{current_schema}   = $schema;
     local $self->{current_instance} = $instance;
 
-    if ( $self->enable_history ) {
+    $_->validate($self, $schema, $instance);
+
+    if ( $ENV{JSV_TRACE} || $self->enable_history ) {
         push @{ $self->history }, +{
             keyword  => $self->current_keyword,
             pointer  => $self->current_pointer,
@@ -102,8 +103,6 @@ sub apply_keyword {
             instance => $instance,
         };
     }
-
-    $_->validate($self, $schema, $instance);
 }
 
 sub log_error {
@@ -130,7 +129,7 @@ sub log_error {
         message  => $message,
     };
 
-    if ( $ENV{JSV_DEBUG} ) {
+    if ( $ENV{JSV_TRACE} ) {
         use Data::Dump qw/dump/;
         warn dump($self->history);
         warn dump($error);

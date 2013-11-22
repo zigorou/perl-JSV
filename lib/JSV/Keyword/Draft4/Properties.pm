@@ -8,28 +8,17 @@ use JSV::Keyword qw(:constants);
 use JSV::Util::Type qw(detect_instance_type);
 
 sub instance_type() { INSTANCE_TYPE_OBJECT(); }
-sub keyword() { "properties" }
+sub keyword() { 'properties' }
 sub keyword_priority() { 10; }
 
 sub validate {
     my ($class, $context, $schema, $instance) = @_;
 
-    unless (
-        $schema->{$class->keyword} ||
-        $schema->{"additionalProperties"} ||
-        $schema->{"patternProperties"}
-    ) {
-        return 1;
-    }
+    my $properties = $class->keyword_value($schema) || {};
+    my $pattern_properties = $class->keyword_value($schema, "patternProperties") || {};
 
-    my $properties = $class->keyword_value($schema);
-    $properties ||= {};
-
-    my $pattern_properties = $class->keyword_value($schema, "patternProperties");
-    $pattern_properties ||= {};
     my @patterns = ();
     my @pattern_schemas = ();
-
     for my $pattern (keys %$pattern_properties) {
         push(@patterns, qr/$pattern/);
         push(@pattern_schemas, $pattern_properties->{$pattern});
