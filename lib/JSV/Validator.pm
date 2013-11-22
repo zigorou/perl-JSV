@@ -5,7 +5,7 @@ use warnings;
 
 use Class::Accessor::Lite (
     new => 0,
-    rw  => [qw/reference environment throw_error/]
+    rw  => [qw/reference environment environment_keywords throw_error/]
 );
 use Clone qw(clone);
 use JSON;
@@ -62,6 +62,7 @@ sub new {
     }
 
     bless {
+        environment_keywords => \%environment_keywords,
         %args,
     } => $class;
 }
@@ -70,18 +71,28 @@ sub validate {
     my ($self, $schema, $instance) = @_;
 
     my $context = JSV::Context->new(
-        json                   => JSON->new->allow_nonref,
+        keywords               => +{
+            INSTANCE_TYPE_ANY()     => $self->instance_type_keywords(INSTANCE_TYPE_ANY),
+            INSTANCE_TYPE_NUMERIC() => $self->instance_type_keywords(INSTANCE_TYPE_NUMERIC),
+            INSTANCE_TYPE_STRING()  => $self->instance_type_keywords(INSTANCE_TYPE_STRING),
+            INSTANCE_TYPE_ARRAY()   => $self->instance_type_keywords(INSTANCE_TYPE_ARRAY),
+            INSTANCE_TYPE_OBJECT()  => $self->instance_type_keywords(INSTANCE_TYPE_OBJECT),
+        },
         reference              => $self->reference,
         environment            => $self->environment,
-        environment_keywords   => \%environment_keywords,
         original_schema        => $schema,
-        resolved_schema        => undef,
         throw_error            => $self->throw_error,
         errors                 => [],
         pointer_tokens         => [],
+        json                   => JSON->new->allow_nonref,
     );
 
     return $context->validate($schema, $instance);
+}
+
+sub instance_type_keywords {
+    my ($self, $instance_type) = @_;
+    return $self->environment_keywords->{$self->environment}{$instance_type};
 }
 
 sub register_schema {

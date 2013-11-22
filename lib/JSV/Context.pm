@@ -6,14 +6,12 @@ use warnings;
 use Class::Accessor::Lite (
     new => 1,
     rw  => [qw/
-        json
+        keywords
         reference
-        environment
-        environment_keywords
-        resolved_schema
         original_schema
         throw_error
         pointer_tokens
+        json
     /],
     ro  => [qw/
         errors
@@ -28,10 +26,6 @@ use JSON::XS;
 use JSV::Keyword qw(:constants);
 use JSV::Util::Type qw(detect_instance_type);
 
-sub instance_type_keywords {
-    my ($self, $instance_type) = @_;
-    return @{$self->environment_keywords->{$self->environment}{$instance_type}};
-}
 
 sub validate {
     my ($self, $schema, $instance) = @_;
@@ -40,31 +34,31 @@ sub validate {
 
     my $rv;
     eval {
-        for ($self->instance_type_keywords(INSTANCE_TYPE_ANY)) {
+        for (@{ $self->keywords->{INSTANCE_TYPE_ANY()} }) {
             next unless exists $schema->{$_->keyword};
             $self->apply_keyword($_, $schema, $instance);
         }
 
         if ($self->current_type eq "integer" || $self->current_type eq "number") {
-            for ($self->instance_type_keywords(INSTANCE_TYPE_NUMERIC)) {
+            for (@{ $self->keywords->{INSTANCE_TYPE_NUMERIC()} }) {
                 next unless exists $schema->{$_->keyword};
                 $self->apply_keyword($_, $schema, $instance);
             }
         }
         elsif ($self->current_type eq "string") {
-            for ($self->instance_type_keywords(INSTANCE_TYPE_STRING)) {
+            for (@{ $self->keywords->{INSTANCE_TYPE_STRING()} }) {
                 next unless exists $schema->{$_->keyword};
                 $self->apply_keyword($_, $schema, $instance);
             }
         }
         elsif ($self->current_type eq "array") {
-            for ($self->instance_type_keywords(INSTANCE_TYPE_ARRAY)) {
+            for (@{ $self->keywords->{INSTANCE_TYPE_ARRAY()} }) {
                 next unless exists $schema->{$_->keyword};
                 $self->apply_keyword($_, $schema, $instance);
             }
         }
         elsif ($self->current_type eq "object") {
-            for ($self->instance_type_keywords(INSTANCE_TYPE_OBJECT)) {
+            for (@{ $self->keywords->{INSTANCE_TYPE_OBJECT()} }) {
                 next unless exists $schema->{$_->keyword};
                 $self->apply_keyword($_, $schema, $instance);
             }
