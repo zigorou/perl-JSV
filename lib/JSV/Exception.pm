@@ -5,19 +5,34 @@ use warnings;
 
 use Carp;
 use Class::Accessor::Lite (
-    new => 0,
-    rw  => [qw/message pointer_tokens type keyword/]
+    new => 1,
+    rw  => [qw/error errors history/]
 );
 
 sub throw {
-    my ($class, $message, $context) = @_;
-    my $exception = bless {
-        message        => $message,
-        pointer_tokens => $context->pointer_tokens,
-        type           => $context->current_type,
-        keyword        => $context->keyword,
-    } => $class;
-    croak $exception;
+    my ($class, %args) = @_;
+    croak $class->new(%args);
+}
+
+sub get_error {
+    my ($self, $pointer) = @_;
+
+    if ( $self->error ) {
+        return $self->error;
+    }
+    elsif ( $self->errors ) {
+        if ( $pointer ) {
+            return grep { $_->{pointer} eq $pointer } @{ $self->errors };
+        }
+        else {
+            return $self->errors;
+        }
+    }
+}
+
+sub get_error_map {
+    my $self = shift;
+    return +{map { $_->{pointer} => $_ } @{ $self->errors }};
 }
 
 1;

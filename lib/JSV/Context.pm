@@ -28,6 +28,7 @@ use Class::Accessor::Lite (
 use JSON::XS;
 use JSV::Keyword qw(:constants);
 use JSV::Util::Type qw(detect_instance_type);
+use JSV::Exception;
 
 
 sub validate {
@@ -70,8 +71,11 @@ sub validate {
         $rv = 1;
     };
     if ( scalar @{ $self->errors } ) {
-        if ($self->throw_error) {
-            croak $self->errors;
+        if ( $self->throw_error ) {
+            JSV::Exception->throw(
+                errors => $self->errors,
+                ($self->enable_history ? (history => $self->history) : ()),
+            );
         }
         $rv = 0;
     }
@@ -130,7 +134,10 @@ sub log_error {
     }
 
     if ( $self->throw_immediate ) {
-        croak $error;
+        JSV::Exception->throw(
+            error => $error,
+            ($self->enable_history ? (history => $self->history) : ()),
+        );
     }
     else {
         push @{ $self->{errors} }, $error;
