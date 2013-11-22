@@ -11,8 +11,8 @@ use Class::Accessor::Lite (
         original_schema
         throw_error
         throw_immediate
-        history
         enable_history
+        history
         json
     /],
     ro  => [qw/
@@ -89,48 +89,34 @@ sub validate {
 sub apply_keyword {
     my ($self, $keyword, $schema, $instance) = @_;
 
-    local $self->{current_errors}   = [];
     local $self->{current_keyword}  = $_->keyword;
     local $self->{current_schema}   = $schema;
     local $self->{current_instance} = $instance;
 
-    if ( $self->enable_history ) {
+    $_->validate($self, $schema, $instance);
+
+    if ( $ENV{JSV_TRACE} || $self->enable_history ) {
         push @{ $self->history }, +{
             keyword  => $self->current_keyword,
             pointer  => $self->current_pointer,
             schema   => $self->current_schema,
-            instance => $instance,
+            instance => $self->resolve_current_instance,
         };
     }
-
-    $_->validate($self, $schema, $instance);
 }
 
 sub log_error {
     my ($self, $message) = @_;
 
-    my $instance;
-    if ( ref $self->current_instance ) {
-        if ( $self->current_instance == JSON::true ) {
-            $instance = "true";
-        }
-        elsif ( $self->current_instance == JSON::false ) {
-            $instance = "false";
-        }
-    }
-    else {
-        $instance = $self->current_instance;
-    }
-
     my $error = +{
         keyword  => $self->current_keyword,
         pointer  => $self->current_pointer,
         schema   => $self->current_schema,
-        instance => $instance,
+        instance => $self->resolve_current_instance,
         message  => $message,
     };
 
-    if ( $ENV{JSV_DEBUG} ) {
+    if ( $ENV{JSV_TRACE} ) {
         use Data::Dump qw/dump/;
         warn dump($self->history);
         warn dump($error);
@@ -145,6 +131,25 @@ sub log_error {
     else {
         push @{ $self->{errors} }, $error;
     }
+}
+
+sub resolve_current_instance {
+    my $self = shift;
+
+    my $instance;
+    if ( ref $self->current_instance ) {
+        if ( $self->current_instance == JSON::true ) {
+            $instance = "true";
+        }
+        elsif ( $self->current_instance == JSON::false ) {
+            $instance = "false";
+        }
+    }
+    else {
+        $instance = $self->current_instance;
+    }
+
+    return $instance;
 }
 
 1;
