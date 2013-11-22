@@ -8,7 +8,6 @@ use Carp;
 use JSON::XS;
 
 use JSV::Keyword qw(:constants);
-use JSV::Exception;
 use JSV::Util::Type qw(detect_instance_type);
 
 sub instance_type() { INSTANCE_TYPE_ARRAY(); }

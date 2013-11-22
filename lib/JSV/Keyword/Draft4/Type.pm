@@ -9,7 +9,6 @@ use JSON;
 use List::Util qw(first);
 use Scalar::Util qw(blessed);
 
-use JSV::Exception;
 use JSV::Keyword qw(:constants);
 use JSV::Util::Type qw(detect_instance_type);
 

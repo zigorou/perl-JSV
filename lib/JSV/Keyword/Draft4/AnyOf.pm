@@ -6,7 +6,6 @@ use parent qw(JSV::Keyword);
 
 use JSV::Keyword qw(:constants);
 use JSV::Util::Type qw(detect_instance_type);
-use JSV::Exception;
 
 sub instance_type() { INSTANCE_TYPE_ANY(); }
 sub keyword() { "anyOf" }

@@ -6,7 +6,6 @@ use parent qw(JSV::Keyword);
 use JSON;
 
 use JSV::Keyword qw(:constants);
-use JSV::Exception;
 
 sub instance_type() { INSTANCE_TYPE_NUMERIC(); }
 sub keyword() { "maximum" }

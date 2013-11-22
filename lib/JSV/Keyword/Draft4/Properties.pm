@@ -4,7 +4,6 @@ use strict;
 use warnings;
 use parent qw(JSV::Keyword);
 
-use JSV::Exception;
 use JSV::Keyword qw(:constants);
 use JSV::Util::Type qw(detect_instance_type);
 
