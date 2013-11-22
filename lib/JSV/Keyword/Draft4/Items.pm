@@ -25,14 +25,13 @@ sub validate {
 
     if ($items_type eq "object") { ### items as schema
         for (my $i = 0, my $l = scalar @$instance; $i < $l; $i++) {
-            push(@{$context->pointer_tokens}, $i);
+            local $context->{current_pointer} .= "/" . $i;
             $context->validate($items, $instance->[$i]);
-            pop(@{$context->pointer_tokens});
         }
     }
     elsif ($items_type eq "array") { ### items as schema array
         for (my $i = 0, my $l = scalar @$instance; $i < $l; $i++) {
-            push(@{$context->pointer_tokens}, $i);
+            local $context->{current_pointer} .= "/" . $i;
 
             if (defined $items->[$i]) {
                 $context->validate($items->[$i], $instance->[$i]);
@@ -43,8 +42,6 @@ sub validate {
             elsif ($additional_items_type eq "boolean" && $additional_items == JSON::false) {
                 $context->log_error("additionalItems are now allowed");
             }
-
-            pop(@{$context->pointer_tokens});
          }
     }
     else { ### wrong schema

@@ -21,7 +21,7 @@ sub validate {
     for my $property (keys %$dependencies) {
         next unless (exists $instance->{$property});
 
-        push(@{$context->pointer_tokens}, $property);
+        local $context->{current_pointer} .= "/" . $property;
 
         if (ref $dependencies->{$property} eq "ARRAY") {
             my $found_against_dependency = first { !exists $instance->{$_} } @{$dependencies->{$property}};
@@ -32,8 +32,6 @@ sub validate {
         elsif (ref $dependencies->{$property} eq "HASH") {
             $context->validate($dependencies->{$property}, $instance);
         }
-
-        pop(@{$context->pointer_tokens});
     }
 }
 

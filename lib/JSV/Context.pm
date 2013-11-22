@@ -11,7 +11,6 @@ use Class::Accessor::Lite (
         original_schema
         throw_error
         throw_immediate
-        pointer_tokens
         history
         enable_history
         json
@@ -20,6 +19,7 @@ use Class::Accessor::Lite (
         errors
         current_type
         current_keyword
+        current_pointer
         current_instance
         current_schema
     /],
@@ -90,7 +90,7 @@ sub apply_keyword {
     if ( $self->enable_history ) {
         push @{ $self->history }, +{
             keyword  => $self->current_keyword,
-            pointer  => (join "/", @{ $self->pointer_tokens }),
+            pointer  => $self->current_pointer,
             schema   => $self->current_schema,
             instance => $instance,
         };
@@ -117,7 +117,7 @@ sub log_error {
 
     my $error = +{
         keyword  => $self->current_keyword,
-        pointer  => (join "/", @{ $self->pointer_tokens }),
+        pointer  => $self->current_pointer,
         schema   => $self->current_schema,
         instance => $instance,
         message  => $message,

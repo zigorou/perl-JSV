@@ -94,7 +94,7 @@ sub validate {
         enable_history  => $self->enable_history,
         history         => [],
         errors          => [],
-        pointer_tokens  => [],
+        current_pointer => "",
         json            => JSON->new->allow_nonref,
     );
 

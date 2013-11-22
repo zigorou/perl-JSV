@@ -40,7 +40,7 @@ sub validate {
     my %s = map { $_ => undef } keys %$instance;
 
     for my $property (keys %$instance) {
-        push(@{$context->pointer_tokens}, $property);
+        local $context->{current_pointer} .= "/" . $property;
 
         if (exists $properties->{$property}) {
             $context->validate($properties->{$property}, $instance->{$property});
@@ -56,8 +56,6 @@ sub validate {
         if (exists $s{$property} && $additional_properties_type eq "object") {
             $context->validate($additional_properties, $instance->{$property});
         }
-
-        pop(@{$context->pointer_tokens});
     }
 
     if ($additional_properties_type eq "boolean" && !$additional_properties) {
