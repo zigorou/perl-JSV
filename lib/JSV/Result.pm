@@ -32,7 +32,7 @@ sub get_error {
             return grep { $_->{pointer} eq $pointer } @{ $self->errors };
         }
         else {
-            return $self->errors;
+            return @{ $self->errors };
         }
     }
 }
