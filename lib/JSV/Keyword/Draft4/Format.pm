@@ -22,31 +22,31 @@ sub validate {
     if ($format eq 'date-time') {
         # RFC3339
         unless ($instance =~ /\A\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d+)?(Z|[+-]\d{2}:\d{2})/) {
-            $context->log_error(sprintf("format isn`t date-time: %s", $instance));
+            $context->log_error("The instance does not pass 'date-time' format check");
         }
     } elsif ($format eq 'uri') {
         unless (is_uri($instance)) {
-            $context->log_error(sprintf("format isn`t uri: %s", $instance));
+            $context->log_error("The instance does not pass 'uri' format check");
         }
     } elsif ($format eq 'email') {
         # TODO: enable change to Email::Valid or Email::Valid::Loose
         unless (Email::Valid::Loose->address($instance)) {
-            $context->log_error(sprintf("format isn`t email: %s", $instance));
+            $context->log_error("The instance does not pass 'email' format check");
         }
     } elsif ($format eq 'ipv4') {
         unless (is_ipv4($instance)) {
-            $context->log_error(sprintf("format isn`t ipv4: %s", $instance));
+            $context->log_error("The instance does not pass 'ipv4' format check");
         }
     } elsif ($format eq 'ipv6') {
         unless (is_ipv6($instance)) {
-            $context->log_error(sprintf("format isn`t ipv6: %s", $instance));
+            $context->log_error("The instance does not pass 'ipv6' format check");
         }
     } elsif ($format eq 'hostname') {
         unless (is_domain($instance)) {
-            $context->log_error(sprintf("format isn`t hostname: %s", $instance));
+            $context->log_error("The instance does not pass 'hostname' format check");
         }
     } else {
-        $context->log_error(sprintf("unknown format: format = %s, value = %s", $format, $instance));
+        $context->log_error(sprintf("unknown format: format = %s", $format));
     }
 }
 
