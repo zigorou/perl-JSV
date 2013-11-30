@@ -63,7 +63,9 @@ sub resolve {
     }
 
     ### TODO: should throw exception
-    return 0 unless (ref $ref_obj eq 'HASH');
+    unless (ref $ref_obj eq 'HASH') {
+        die sprintf("cannot resolve reference: base_uri = %s, uri = %s", $opts->{base_uri} || "undef", $ref_uri);
+    }
 
     ### recursive resolution
     while (ref $ref_obj eq 'HASH') {
