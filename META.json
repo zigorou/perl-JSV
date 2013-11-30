@@ -4,7 +4,7 @@
       "zigorou <zigorou@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v0.6.2, CPAN::Meta::Converter version 2.120921",
+   "generated_by" : "Minilla/v0.8.0, CPAN::Meta::Converter version 2.132830",
    "license" : [
       "perl_5"
    ],
@@ -21,7 +21,8 @@
          "share",
          "eg",
          "examples",
-         "author"
+         "author",
+         "builder"
       ]
    },
    "prereqs" : {
@@ -45,8 +46,17 @@
             "B" : "0",
             "Carp" : "0",
             "Class::Accessor::Lite" : "0",
-            "Data::Clone" : "0",
+            "Clone" : "0",
+            "Data::Validate::Domain" : "0",
+            "Data::Validate::IP" : "0",
+            "Data::Validate::URI" : "0",
+            "Data::Walk" : "0",
+            "Email::Valid::Loose" : "0",
             "Exporter" : "0",
+            "File::Basename" : "0",
+            "File::Spec" : "0",
+            "FindBin" : "0",
+            "Hash::MultiValue" : "0",
             "JSON" : "0",
             "JSON::Pointer" : "0",
             "List::MoreUtils" : "0",
@@ -67,14 +77,19 @@
    "release_status" : "unstable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/zentooo/perl-JSV/issues"
+         "web" : "https://github.com/zigorou/perl-JSV/issues"
       },
-      "homepage" : "https://github.com/zentooo/perl-JSV",
+      "homepage" : "https://github.com/zigorou/perl-JSV",
       "repository" : {
-         "type" : "git",
-         "url" : "git://github.com/zentooo/perl-JSV.git",
-         "web" : "https://github.com/zentooo/perl-JSV"
+         "url" : "https://github.com/zigorou/perl-JSV.git",
+         "web" : "https://github.com/zigorou/perl-JSV"
       }
    },
-   "version" : "0.01"
+   "version" : "0.01",
+   "x_contributors" : [
+      "maedama <klemensplatz+githhub@gmail.com>",
+      "Tomohiro Mitsumune <tomohiro.mitsumune@dena.com>",
+      "Naosuke Yokoe <ankerasoy@gmail.com>",
+      "yokoe.naosuke <yokoe.naosuke@dena.jp>"
+   ]
 }
