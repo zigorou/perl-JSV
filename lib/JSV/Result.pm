@@ -7,6 +7,7 @@ use overload
     'eq'   => \&equals;
 
 use Carp;
+use Hash::MultiValue;
 use Class::Accessor::Lite (
     new => 1,
     rw  => [qw/instance error errors history/]
@@ -39,7 +40,7 @@ sub get_error {
 
 sub get_error_map {
     my $self = shift;
-    return +{map { $_->{pointer} => $_ } @{ $self->errors }};
+    return Hash::MultiValue->new(map { $_->{pointer} => $_ } @{ $self->errors });
 }
 
 1;

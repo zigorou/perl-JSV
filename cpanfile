@@ -18,6 +18,7 @@ requires 'Module::Pluggable::Object';
 requires 'Scalar::Util';
 requires 'URI';
 requires 'URI::Split';
+requires 'Hash::MultiValue';
 requires 'File::Basename';
 requires 'File::Spec';
 requires 'FindBin';
