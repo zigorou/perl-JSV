@@ -4,10 +4,6 @@ use strict;
 use warnings;
 use parent qw(JSV::Keyword);
 
-use Data::Validate::Domain qw(is_domain);
-use Data::Validate::IP qw(is_ipv4 is_ipv6);
-use Data::Validate::URI qw(is_uri);
-use Email::Valid::Loose;
 use JSV::Keyword qw(:constants);
 
 sub instance_type() { INSTANCE_TYPE_STRING(); }
