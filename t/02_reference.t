@@ -8,9 +8,11 @@ use JSV::Reference;
 
 subtest "cannot resolve reference" => sub {
     my $reference = JSV::Reference->new;
-    dies_ok {
-        $reference->resolve(+{ '$ref' => "http://example.schema.com/schema#fragment" });
+    eval {
+        $reference->resolve(+{ '$ref' => "http://example.schema.com/schema#fragment" }, +{});
     };
+    note $@;
+    ok $@;
 };
 
 done_testing;
