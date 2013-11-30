@@ -16,7 +16,7 @@ sub keyword_priority() { 10; }
 
 sub validate {
     my ($class, $context, $schema, $instance) = @_;
-    return unless $context->format_support;
+    return unless $context->format_support || keys %{ $context->format_support } == 0;
 
     my $format = $class->keyword_value($schema);
 

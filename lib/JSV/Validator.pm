@@ -59,9 +59,35 @@ sub new {
     my $class = shift;
     my %args  = @_;
     %args = (
-        environment    => 'draft4',
-        enable_history => 0,
-        reference      => JSV::Reference->new,
+        environment     => 'draft4',
+        enable_history  => 0,
+        reference       => JSV::Reference->new,
+        format_support  => +{
+            'date-time' => sub {
+                # RFC3339
+                ($_[0] =~ /\A\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d+)?(Z|[+-]\d{2}:\d{2})/);
+            },
+            uri => sub {
+                require Data::Validate::URI;
+                Data::Validate::URI::is_uri($_[0]);
+            },
+            email => sub {
+                require Email::Valid::Loose;
+                Email::Valid::Loose->address($_[0]);
+            },
+            ipv4 => sub {
+                require Data::Validate::IP;
+                Data::Validate::IP::is_ipv4($_[0]);
+            },
+            ipv6 => sub {
+                require Data::Validate::IP;
+                Data::Validate::IP::is_ipv6($_[0]);
+            },
+            hostname => sub {
+                require Data::Validate::Domain;
+                Data::Validate::Domain::is_domain($_[0]);
+            },
+        },
         %args,
     );
 
@@ -93,32 +119,7 @@ sub validate {
         throw_error     => $self->throw_error,
         throw_immediate => $self->throw_immediate,
         enable_history  => $self->enable_history,
-        format_support  => $self->format_support || +{
-            'date-time' => sub {
-                # RFC3339
-                ($_[0] =~ /\A\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d+)?(Z|[+-]\d{2}:\d{2})/);
-            },
-            uri => sub {
-                require Data::Validate::URI;
-                Data::Validate::URI::is_uri($_[0]);
-            },
-            email => sub {
-                require Email::Valid::Loose;
-                Email::Valid::Loose->address($_[0]);
-            },
-            ipv4 => sub {
-                require Data::Validate::IP;
-                Data::Validate::IP::is_ipv4($_[0]);
-            },
-            ipv6 => sub {
-                require Data::Validate::IP;
-                Data::Validate::IP::is_ipv6($_[0]);
-            },
-            hostname => sub {
-                require Data::Validate::Domain;
-                Data::Validate::Domain::is_domain($_[0]);
-            },
-        },
+        format_support  => $self->format_support,
         history         => [],
         errors          => [],
         current_pointer => "",
@@ -139,6 +140,11 @@ sub register_schema {
 
 sub unregister_schema {
     shift->reference->unregister_schema(@_);
+}
+
+sub register_format {
+    my ($self, $format, $format_validator) = @_;
+    shift->format_support->{$format} = $format_validator;
 }
 
 1;
