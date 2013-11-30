@@ -54,18 +54,21 @@ sub resolve {
             $ref_obj = JSON::Pointer->get($opts->{root}, $ref_uri->fragment, 1);
         };
         if (my $e = $@) {
-            die sprintf("cannot resolve reference: base_uri = %s, fragment = %s, msg = %s", $opts->{base_uri}, $ref_uri->fragment, $e);
+            die sprintf("cannot resolve reference: ref_uri = %s, msg = %s", $ref_uri, $e);
         }
     }
 
     unless (ref $ref_obj eq 'HASH') {
-        die sprintf("cannot resolve reference: base_uri = %s, uri = %s", $opts->{base_uri} || "undef", $ref_uri);
+        die sprintf("cannot resolve reference: ref_uri = %s", $ref_uri);
     }
 
     ### recursive resolution
     while (ref $ref_obj eq 'HASH') {
         $opts->{root} = $parent_schema if $parent_schema;
-        $self->resolve($ref_obj, $opts);
+        eval {
+            $self->resolve($ref_obj, $opts);
+        };
+        last if $@;
     }
     ### TODO: Does this weaken have means?
     weaken($ref_obj);
@@ -88,8 +91,7 @@ sub get_schema {
             $inner_schema = JSON::Pointer->get($schema, $fragment, 1);
         };
         if (my $e = $@) {
-            undef $@;
-            return;
+            die sprintf("cannot resolve reference: ref_uri = %s, msg = %s", $uri, $e);
         }
         return ($inner_schema, $schema);
     }
