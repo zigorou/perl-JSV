@@ -9,10 +9,11 @@ use Class::Accessor::Lite (
         reference
         environment
         environment_keywords
+        enable_format
         enable_history
         throw_error
         throw_immediate
-        format_support
+        formats
     /]
 );
 use Clone qw(clone);
@@ -61,8 +62,9 @@ sub new {
     %args = (
         environment     => 'draft4',
         enable_history  => 0,
+        enable_format   => 1,
         reference       => JSV::Reference->new,
-        format_support  => +{
+        formats         => +{
             'date-time' => sub {
                 # RFC3339
                 ($_[0] =~ /\A\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d+)?(Z|[+-]\d{2}:\d{2})/);
@@ -113,17 +115,18 @@ sub validate {
             INSTANCE_TYPE_ARRAY()   => $self->instance_type_keywords(INSTANCE_TYPE_ARRAY),
             INSTANCE_TYPE_OBJECT()  => $self->instance_type_keywords(INSTANCE_TYPE_OBJECT),
         },
-        reference       => $self->reference,
-        environment     => $self->environment,
-        original_schema => $schema,
-        throw_error     => $self->throw_error,
-        throw_immediate => $self->throw_immediate,
-        enable_history  => $self->enable_history,
-        format_support  => $self->format_support,
-        history         => [],
-        errors          => [],
-        current_pointer => "",
-        json            => JSON->new->allow_nonref,
+        reference        => $self->reference,
+        environment      => $self->environment,
+        original_schema  => $schema,
+        throw_error      => $self->throw_error,
+        throw_immediate  => $self->throw_immediate,
+        enable_history   => $self->enable_history,
+        enable_format    => $self->enable_format,
+        formats          => $self->formats,
+        history          => [],
+        errors           => [],
+        current_pointer  => "",
+        json             => JSON->new->allow_nonref,
     );
 
     return $context->validate($schema, $instance);
@@ -144,7 +147,7 @@ sub unregister_schema {
 
 sub register_format {
     my ($self, $format, $format_validator) = @_;
-    shift->format_support->{$format} = $format_validator;
+    shift->formats->{$format} = $format_validator;
 }
 
 1;

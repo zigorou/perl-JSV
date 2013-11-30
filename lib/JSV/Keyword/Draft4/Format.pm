@@ -16,11 +16,11 @@ sub keyword_priority() { 10; }
 
 sub validate {
     my ($class, $context, $schema, $instance) = @_;
-    return unless $context->format_support || keys %{ $context->format_support } == 0;
+    return unless $context->enable_format;
 
     my $format = $class->keyword_value($schema);
 
-    if ( my $format_validator = $context->format_support->{$format} ) {
+    if ( my $format_validator = $context->formats->{$format} ) {
         unless ( $format_validator->($instance) ) {
             $context->log_error("The instance does not pass '$format' format check");
         }

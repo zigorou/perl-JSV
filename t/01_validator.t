@@ -10,15 +10,15 @@ subtest "register_format" => sub {
         $validator->register_format("hoge" => sub {
             $_[0] eq "hoge";
         });
-        ok $validator->format_support->{"hoge"};
+        ok $validator->formats->{"hoge"};
     };
     subtest "register from zero" => sub {
-        my $validator = JSV::Validator->new(format_support => +{});
+        my $validator = JSV::Validator->new(formats => +{});
         $validator->register_format("hoge" => sub {
             $_[0] eq "hoge";
         });
-        ok $validator->format_support->{"hoge"};
-        is keys %{ $validator->format_support }, 1;
+        ok $validator->formats->{"hoge"};
+        is keys %{ $validator->formats }, 1;
     };
 };
 
