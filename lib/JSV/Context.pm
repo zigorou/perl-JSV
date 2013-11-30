@@ -97,7 +97,7 @@ sub apply_keyword {
 
     $_->validate($self, $schema, $instance);
 
-    if ( $ENV{JSV_TRACE} || $self->enable_history ) {
+    if ( $ENV{JSV_DEBUG} || $self->enable_history ) {
         push @{ $self->history }, +{
             keyword  => $self->current_keyword,
             pointer  => $self->current_pointer,
@@ -118,10 +118,10 @@ sub log_error {
         message  => $message,
     };
 
-    if ( $ENV{JSV_TRACE} ) {
-        use Data::Dump qw/dump/;
-        warn dump($self->history);
-        warn dump($error);
+    if ( $ENV{JSV_DEBUG} ) {
+        require Data::Dump;
+        warn "history = " . Data::Dump::dump($self->history);
+        warn "error = " . Data::Dump::dump($error);
     }
 
     if ( $self->throw_immediate ) {
