@@ -12,6 +12,8 @@ use Class::Accessor::Lite (
         throw_error
         throw_immediate
         enable_history
+        enable_format
+        formats
         history
         json
     /],
