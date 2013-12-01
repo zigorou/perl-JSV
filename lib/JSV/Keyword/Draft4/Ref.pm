@@ -17,7 +17,7 @@ sub validate {
         $context->reference->resolve(
             $schema,
             +{
-                base_uri => $context->original_schema->{id} || undef,
+                base_uri => $context->original_schema->{id},
                 root     => $context->original_schema
             }
         );

@@ -28,72 +28,43 @@ sub new {
 
 sub resolve {
     my ($self, $ref, $opts) = @_;
-
-    %$opts = (
-        base_uri => undef,
-        root     => undef,
-        %$opts,
-    );
-
     die 'ref value should be hash' unless ref $ref eq 'HASH';
     die '$ref not found'           unless exists $ref->{'$ref'};
 
     my $ref_uri = URI->new($ref->{'$ref'});
-    if ( !$ref_uri->scheme && $opts->{base_uri} ) {
-        $ref_uri = $ref_uri->abs($opts->{base_uri});
+    my $ref_obj = $self->get_schema($ref_uri, $opts);
+
+    if ( ref $ref_obj eq 'HASH' && exists $ref_obj->{'$ref'} ) {
+        $self->resolve($ref_obj, $opts);
     }
 
-    my ($normalize_uri, $fragment);
-    my ($ref_obj, $parent_schema);
-
-    if ($ref_uri->scheme) {
-        ($ref_obj, $parent_schema) = $self->get_schema($ref_uri);
-    }
-    elsif ( defined $ref_uri->fragment && defined $opts->{root} && ref $opts->{root} eq 'HASH' ) {
-        eval {
-            $ref_obj = JSON::Pointer->get($opts->{root}, $ref_uri->fragment, 1);
-        };
-        if (my $e = $@) {
-            die sprintf("cannot resolve reference: ref_uri = %s, msg = %s", $ref_uri, $e);
-        }
-    }
-
-    unless (ref $ref_obj eq 'HASH') {
-        die sprintf("cannot resolve reference: ref_uri = %s", $ref_uri);
-    }
-
-    ### recursive resolution
-    while (ref $ref_obj eq 'HASH') {
-        $opts->{root} = $parent_schema if $parent_schema;
-        eval {
-            $self->resolve($ref_obj, $opts);
-        };
-        last if $@;
-    }
     ### TODO: Does this weaken have means?
     weaken($ref_obj);
     %$ref = %$ref_obj;
-    $ref->{id} = $ref_uri->as_string;
-    return 1;
 
+    $ref->{id} = $ref_uri->as_string;
 }
 
 sub get_schema {
-    my ($self, $uri) = @_;
+    my ($self, $uri, $opts) = @_;
+    if ( ! $uri->scheme && $opts->{base_uri} ) {
+        $uri = $uri->abs($opts->{base_uri});
+    }
+
     my ($normalized_uri, $fragment) = $self->normalize_uri($uri);
+    my $schema = $self->{registered_schema_map}{$normalized_uri} || $opts->{root};
 
-    my $schema = $self->{registered_schema_map}{$normalized_uri};
-    return unless ($schema);
-
-    if (defined $fragment) {
-        my $inner_schema;
+    if ( $fragment ) {
         eval {
-            $inner_schema = JSON::Pointer->get($schema, $fragment, 1);
+            $schema = JSON::Pointer->get($schema, $fragment, 1);
         };
         if (my $e = $@) {
-            die sprintf("cannot resolve reference: ref_uri = %s, msg = %s", $uri, $e);
+            die sprintf("cannot resolve reference: uri = %s, msg = %s", $uri, $e);
         }
-        return ($inner_schema, $schema);
+    }
+
+    unless (ref $schema eq 'HASH') {
+        die sprintf("cannot resolve reference: uri = %s", $uri);
     }
 
     return $schema;
@@ -108,10 +79,10 @@ sub register_schema {
     walkdepth(+{
         wanted => sub {
             if (
-                defined $Data::Walk::type && 
-                $Data::Walk::type eq "HASH" && 
-                exists $_->{'$ref'} && 
-                !ref $_->{'$ref'} && 
+                defined $Data::Walk::type &&
+                $Data::Walk::type eq "HASH" &&
+                exists $_->{'$ref'} &&
+                !ref $_->{'$ref'} &&
                 keys %$_ == 1
             ) {
                 my $ref_uri = URI->new($_->{'$ref'});

@@ -49,7 +49,7 @@ sub validate {
 
     if ($additional_properties_type eq "boolean" && !$additional_properties) {
         if (keys %s > 0) {
-            $context->log_error("Not allowed properties are existence (properties: %s)", join(", ", keys %s));
+            $context->log_error(sprintf("Not allowed properties are existence (properties: %s)", join(", ", keys %s)));
         }
     }
 }
