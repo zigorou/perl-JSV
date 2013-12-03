@@ -32,6 +32,8 @@ sub resolve {
     die '$ref not found'           unless exists $ref->{'$ref'};
 
     my $ref_uri = URI->new($ref->{'$ref'});
+    die '$ref format invalid'      unless $ref_uri->scheme || $ref_uri->fragment || $ref_uri->as_string eq "#";
+
     my $ref_obj = $self->get_schema($ref_uri, $opts);
 
     if ( ref $ref_obj eq 'HASH' && exists $ref_obj->{'$ref'} ) {
