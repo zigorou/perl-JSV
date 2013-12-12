@@ -19,7 +19,7 @@ our %REF_TYPE_MAP = (
 );
 
 sub detect_instance_type {
-    my ($instance) = @_;
+    my $instance = shift;
 
     my $ref_type;
 
