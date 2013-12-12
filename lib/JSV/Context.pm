@@ -33,11 +33,12 @@ use JSON;
 use JSV::Keyword qw(:constants);
 use JSV::Util::Type qw(detect_instance_type);
 use JSV::Result;
+use List::MoreUtils qw(any);
 
 sub validate {
     my ($self, $schema, $instance) = @_;
 
-    local $self->{current_type} = detect_instance_type($instance, $self->{loose_type});
+    local $self->{current_type} = detect_instance_type($instance);
 
     my $rv;
     eval {
@@ -46,13 +47,13 @@ sub validate {
             $self->apply_keyword($_, $schema, $instance);
         }
 
-        if ($self->current_type eq "integer" || $self->current_type eq "number") {
+        if ($self->is_matched_types(qw/integer number/)) {
             for (@{ $self->keywords->{INSTANCE_TYPE_NUMERIC()} }) {
                 next unless exists $schema->{$_->keyword};
                 $self->apply_keyword($_, $schema, $instance);
             }
         }
-        elsif ($self->current_type eq "string") {
+        elsif ($self->is_matched_types( $self->{loose_type} ? qw/string integer number/ : qw/string/ )) {
             for (@{ $self->keywords->{INSTANCE_TYPE_STRING()} }) {
                 next unless exists $schema->{$_->keyword};
                 $self->apply_keyword($_, $schema, $instance);
@@ -152,6 +153,11 @@ sub resolve_current_instance {
     }
 
     return $instance;
+}
+
+sub is_matched_types {
+    my ($self, @types) = @_;
+    return (any { $self->{current_type} eq $_ } @types) > 0 ? 1 : 0;
 }
 
 1;

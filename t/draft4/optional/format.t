@@ -5,11 +5,12 @@ use Test::More;
 use Test::JSV::Suite;
 use JSV::Validator;
 
-subtest "strict mode" => sub {
-    my $validator = JSV::Validator->new;
+my $validator = JSV::Validator->new;
+
+subtest "strict type" => sub {
     Test::JSV::Suite->run(
         version => "draft4",
-        suite   => "enum",
+        suite   => "optional/format",
         cb      => sub {
             my ($schema, $instance) = @_;
             return $validator->validate($schema, $instance);
@@ -17,11 +18,10 @@ subtest "strict mode" => sub {
     );
 };
 
-subtest "loose mode" => sub {
-    my $validator = JSV::Validator->new;
+subtest "loose type" => sub {
     Test::JSV::Suite->run(
         version => "draft4",
-        suite   => "enum",
+        suite   => "optional/format",
         cb      => sub {
             my ($schema, $instance) = @_;
             return $validator->validate($schema, $instance, +{ loose_type => 1 });

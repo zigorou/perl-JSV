@@ -22,24 +22,28 @@ sub validate {
     my $keyword_value = $class->keyword_value($schema);
 
     if (ref $keyword_value eq "ARRAY") {
-        unless ( first { $class->validate_singular_type( $_, $context->current_type ) } @$keyword_value ) {
+        unless ( first { $class->validate_singular_type( $context, $_, $context->current_type ) } @$keyword_value ) {
             $context->log_error("instance type doesn't match schema type list");
         }
     }
     else {
-        unless ($class->validate_singular_type( $keyword_value, $context->current_type )) {
+        unless ($class->validate_singular_type( $context, $keyword_value, $context->current_type )) {
             $context->log_error("instance type doesn't match schema type");
         }
     }
 }
 
 sub validate_singular_type {
-    my ($class, $schema_type, $given_type) = @_;
+    my ($class, $context, $schema_type, $given_type) = @_;
 
     if ( $schema_type eq $given_type || ( $schema_type eq "number" && $given_type eq "integer") ) {
         return 1;
     }
     else {
+        if ($context->loose_type && ( ( $schema_type eq "number" || $schema_type eq "integer" ) && $given_type eq "string" )) {
+            return 1;
+        }
+
         return 0;
     }
 }

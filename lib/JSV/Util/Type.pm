@@ -6,7 +6,7 @@ use Exporter qw(import);
 
 use B;
 use Carp;
-use Scalar::Util qw(blessed looks_like_number);
+use Scalar::Util qw(blessed);
 use JSON;
 
 our @EXPORT_OK = (
@@ -19,7 +19,7 @@ our %REF_TYPE_MAP = (
 );
 
 sub detect_instance_type {
-    my ($instance, $loose_type) = @_;
+    my ($instance) = @_;
 
     my $ref_type;
 
@@ -38,31 +38,19 @@ sub detect_instance_type {
         }
     }
     else {
-        if ($loose_type) {
-            if (looks_like_number($instance)) {
-                if ($instance =~ m/^(?:[+-])[1-9]?\d+$/) {
-                    return "integer";
-                }
-                else {
-                    return "number";
-                }
-            }
-            else {
-                return "string";
-            }
+        my $flags = B::svref_2object(\$instance)->FLAGS;
+
+        if (( $flags & B::SVp_IOK ) == B::SVp_IOK) {
+            return "integer";
+        }
+        elsif (( $flags & B::SVp_NOK ) == B::SVp_NOK ) {
+            return "number";
+        }
+        elsif (( $flags & B::SVp_POK ) == B::SVp_POK) {
+            return "string";
         }
         else {
-            my $flags = B::svref_2object(\$instance)->FLAGS;
-
-            if (( $flags & B::SVp_IOK ) == B::SVp_IOK) {
-                return "integer";
-            } elsif (( $flags & B::SVp_NOK ) == B::SVp_NOK ) {
-                return "number";
-            } elsif (( $flags & B::SVp_POK ) == B::SVp_POK) {
-                return "string";
-            } else {
-                croak(sprintf("Unknown type (flags: %s)", $flags));
-            }
+            croak(sprintf("Unknown type (flags: %s)", $flags));
         }
     }
 }

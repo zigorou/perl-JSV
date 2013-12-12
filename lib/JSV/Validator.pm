@@ -61,8 +61,8 @@ sub new {
     my %args  = @_;
     %args = (
         environment     => 'draft4',
-        enable_history  => 0,
         enable_format   => 1,
+        enable_history  => 0,
         reference       => JSV::Reference->new,
         formats         => +{
             'date-time' => sub {

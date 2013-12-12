@@ -14,15 +14,14 @@ sub run {
     my ($class, %opts) = @_;
 
     %opts = (
-        base_dir => File::Spec->catdir(File::Spec->no_upwards(dirname(__FILE__), "../../../t/suite/tests")),
-        version  => "draft4",
-        suite    => "type",
-        cb       => sub {
+        base_dir                    => File::Spec->catdir(File::Spec->no_upwards(dirname(__FILE__), "../../../t/suite/tests")),
+        version                     => "",
+        suite                       => "type",
+        cb                          => sub {
             my ($schema, $instance) = @_;
-            my $rv = 1;
-            return $rv;
+            return 1;
         },
-        verbose => 0,
+        verbose                     => 0,
         %opts
     );
 
@@ -61,7 +60,10 @@ sub run_test_case {
 
 sub load_test_suite {
     my $self = shift;
-    my $test_suite_file = File::Spec->catfile($self->{base_dir}, $self->{version}, $self->{suite} . ".json");
+    my $test_suite_file = File::Spec->catfile(
+        $self->{version} ? ( $self->{base_dir}, $self->{version} ) : ( $self->{base_dir} ), 
+        $self->{suite} . ".json"
+    );
 
     note $test_suite_file;
 

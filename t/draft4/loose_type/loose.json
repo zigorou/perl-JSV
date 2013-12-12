@@ -1,0 +1,47 @@
+[
+    {
+        "description": "Included string, integer, number",
+        "schema": {
+            "type": "object",
+            "properties": {
+                "foo": {
+                    "type": "string"
+                },
+                "bar": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 10
+                },
+                "baz": {
+                    "type": "number"
+                }
+            },
+            "required": ["foo"]
+        },
+        "tests": [
+            {
+                "description": "Only foo",
+                "data": {
+                    "foo": "val"
+                },
+                "valid": true
+            },
+            {
+                "description": "String integer value",
+                "data": {
+                    "foo": "val",
+                    "bar": "5"
+                },
+                "valid": true
+            },
+            {
+                "description": "String numeric value",
+                "data": {
+                    "foo": "val",
+                    "baz": "-1.23"
+                },
+                "valid": true
+            }
+        ]
+    }
+]
