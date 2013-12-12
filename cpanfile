@@ -10,6 +10,10 @@ requires 'Data::Validate::IP';
 requires 'Data::Validate::URI';
 requires 'Email::Valid::Loose';
 requires 'Exporter';
+requires 'File::Basename';
+requires 'File::Spec';
+requires 'FindBin';
+requires 'Hash::MultiValue';
 requires 'JSON';
 requires 'JSON::Pointer';
 requires 'List::Util';
@@ -18,10 +22,6 @@ requires 'Module::Pluggable::Object';
 requires 'Scalar::Util';
 requires 'URI';
 requires 'URI::Split';
-requires 'Hash::MultiValue';
-requires 'File::Basename';
-requires 'File::Spec';
-requires 'FindBin';
 
 on 'test' => sub {
     requires 'Test::More', '0.98';
