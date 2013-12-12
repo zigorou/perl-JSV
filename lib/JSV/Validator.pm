@@ -105,7 +105,13 @@ sub new {
 }
 
 sub validate {
-    my ($self, $schema, $instance) = @_;
+    my ($self, $schema, $instance, $opts) = @_;
+
+    $opts ||= +{};
+    %$opts = (
+        loose_type => 0,
+        %$opts,
+    );
 
     my $context = JSV::Context->new(
         keywords               => +{
@@ -127,6 +133,7 @@ sub validate {
         errors           => [],
         current_pointer  => "",
         json             => JSON->new->allow_nonref,
+        loose_type       => $opts->{loose_type},
     );
 
     return $context->validate($schema, $instance);

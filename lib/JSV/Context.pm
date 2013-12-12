@@ -16,6 +16,7 @@ use Class::Accessor::Lite (
         formats
         history
         json
+        loose_type
     /],
     ro  => [qw/
         errors
@@ -33,11 +34,10 @@ use JSV::Keyword qw(:constants);
 use JSV::Util::Type qw(detect_instance_type);
 use JSV::Result;
 
-
 sub validate {
     my ($self, $schema, $instance) = @_;
 
-    local $self->{current_type} = detect_instance_type($instance);
+    local $self->{current_type} = detect_instance_type($instance, $self->{loose_type});
 
     my $rv;
     eval {
