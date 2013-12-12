@@ -23,7 +23,7 @@ sub validate {
         );
     };
     if ( my $e = $@ ) {
-        $class->log_error(sprintf("Failed to resolve reference: %s", $e));
+        $context->log_error(sprintf("Failed to resolve reference: %s", $e));
     }
 }
 
