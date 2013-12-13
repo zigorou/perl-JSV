@@ -1,0 +1,44 @@
+[
+    {
+        "description": "Hello, World!",
+        "schema": {},
+        "tests": [
+            {
+                "description": "42 (integer)",
+                "data": 42,
+                "valid": true
+            },
+            {
+                "description": "I'm a string",
+                "data": "I'm a string",
+                "valid": true
+            },
+            {
+                "description": "object",
+                "data": {
+                    "an": [ "arbitrarily", "nested" ], 
+                    "data": "structure"
+                },
+                "valid": true
+            }
+        ]
+    },
+    {
+        "description": "The type keyword",
+        "schema": {
+            "type": "string"
+        },
+        "tests": [
+            {
+                "description": "I'm a string",
+                "data": "I'm a string",
+                "valid": true
+            },
+            {
+                "description": "42 (integer)",
+                "data": 42,
+                "valid": false
+            }
+        ]
+    }
+]
