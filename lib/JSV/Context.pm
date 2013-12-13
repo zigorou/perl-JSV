@@ -33,7 +33,6 @@ use JSON;
 use JSV::Keyword qw(:constants);
 use JSV::Util::Type qw(detect_instance_type);
 use JSV::Result;
-use List::MoreUtils qw(any);
 
 sub validate {
     my ($self, $schema, $instance) = @_;
@@ -157,7 +156,7 @@ sub resolve_current_instance {
 
 sub is_matched_types {
     my ($self, @types) = @_;
-    return (any { $self->{current_type} eq $_ } @types) > 0 ? 1 : 0;
+    return (grep { $self->{current_type} eq $_ } @types) > 0 ? 1 : 0;
 }
 
 1;
