@@ -1,0 +1,393 @@
+[
+    {
+        "description": "object",
+        "schema": {
+            "type": "object"
+        },
+        "tests": [
+            {
+                "data": {
+                    "key"         : "value",
+                    "another_key" : "another_value"
+                },
+                "valid": true
+            },
+            {
+                "data": {
+                    "Sun"     : 1.9891e30,
+                    "Jupiter" : 1.8986e27,
+                    "Saturn"  : 5.6846e26,
+                    "Neptune" : 10.243e25,
+                    "Uranus"  : 8.6810e25,
+                    "Earth"   : 5.9736e24,
+                    "Venus"   : 4.8685e24,
+                    "Mars"    : 6.4185e23,
+                    "Mercury" : 3.3022e23,
+                    "Moon"    : 7.349e22,
+                    "Pluto"   : 1.25e22
+                },
+                "valid": true
+            },
+            {
+                "data": "Not an object",
+                "valid": false
+            },
+            {
+                "data": ["An", "array", "not", "an", "object"],
+                "valid": false
+            }
+        ]
+    },
+    {
+        "description": "Properties",
+        "schema": {
+            "type": "object",
+            "properties": {
+                "number":      { "type": "number" },
+                "street_name": { "type": "string" },
+                "street_type": { 
+                    "type": "string",
+                    "enum": ["Street", "Avenue", "Boulevard"]
+                }
+            }
+        },
+        "tests": [
+            {
+                "data": {
+                    "number": 1600, 
+                    "street_name": "Pennsylvania", 
+                    "street_type": "Avenue"
+                },
+                "valid": true
+            },
+            {
+                "data": {
+                    "number": "1600", 
+                    "street_name": "Pennsylvania", 
+                    "street_type": "Avenue"
+                },
+                "valid": false
+            },
+            {
+                "data": {
+                    "number": 1600, 
+                    "street_name": "Pennsylvania"
+                },
+                "valid": true
+            },
+            {
+                "data": {},
+                "valid": true
+            },
+            {
+                "data": {
+                    "number": 1600, 
+                    "street_name": "Pennsylvania", 
+                    "street_type": "Avenue",
+                    "direction": "NW"
+                },
+                "valid": true
+            }
+        ]
+    },
+    {
+        "description": "additionalProperties (boolean, false)",
+        "schema": {
+            "type": "object",
+            "properties": {
+                "number":      { "type": "number" },
+                "street_name": { "type": "string" },
+                "street_type": { 
+                    "type": "string",
+                    "enum": ["Street", "Avenue", "Boulevard"]
+                }
+            },
+            "additionalProperties": false
+        },
+        "tests": [
+            {
+                "data": {
+                    "number": 1600, 
+                    "street_name": "Pennsylvania", 
+                    "street_type": "Avenue"
+                },
+                "valid": true
+            },
+            {
+                "data": {
+                    "number": 1600, 
+                    "street_name": "Pennsylvania", 
+                    "street_type": "Avenue",
+                    "direction": "NW"
+                },
+                "valid": false
+            }
+        ]
+    },
+    {
+        "description": "additionalProperties (object, schema)",
+        "schema": {
+            "type": "object",
+            "properties": {
+                "number":      { "type": "number" },
+                "street_name": { "type": "string" },
+                "street_type": { 
+                    "type": "string",
+                    "enum": ["Street", "Avenue", "Boulevard"]
+                }
+            },
+            "additionalProperties": { "type": "string" }
+        },
+        "tests": [
+            {
+                "data": { "number": 1600, "street_name": "Pennsylvania", "street_type": "Avenue" },
+                "valid": true
+            },
+            {
+                "data": { 
+                    "number": 1600, 
+                    "street_name": "Pennsylvania", 
+                    "street_type": "Avenue",
+                    "direction": "NW" 
+                },
+                "valid": true
+            },
+            {
+                "data": { 
+                    "number": 1600, 
+                    "street_name": "Pennsylvania", 
+                    "street_type": "Avenue",
+                    "office_number": 201
+                },
+                "valid": false
+            }
+        ]
+    },
+    {
+        "description": "Required Properties",
+        "schema": {
+            "type": "object",
+            "properties": {
+                "name":      { "type": "string" },
+                "email":     { "type": "string" },
+                "address":   { "type": "string" },
+                "telephone": { "type": "string" }
+            },
+            "required": ["name", "email"]
+        },
+        "tests": [
+            {
+                "data": {
+                    "name": "William Shakespeare",
+                    "email": "bill@stratford-upon-avon.co.uk"
+                },
+                "valid": true
+            },
+            {
+                "data": {
+                    "name": "William Shakespeare",
+                    "email": "bill@stratford-upon-avon.co.uk",
+                    "address": "Henley Street, Stratford-upon-Avon, Warwickshire, England",
+                    "authorship": "in question"
+                },
+                "valid": true
+            }
+        ]
+    },
+    {
+        "description": "Size",
+        "schema": {
+            "type": "object",
+            "minProperties": 2,
+            "maxProperties": 3
+        },
+        "tests": [
+            {
+                "data": {},
+                "valid": false
+            },
+            {
+                "data": {
+                    "a": 0
+                },
+                "valid": false
+            },
+            {
+                "data": {
+                    "a": 0,
+                    "b": 1
+                },
+                "valid": true
+            },
+            {
+                "data": {
+                    "a": 0,
+                    "b": 1,
+                    "c": 2
+                },
+                "valid": true
+            },
+            {
+                "data": {
+                    "a": 0,
+                    "b": 1,
+                    "c": 2,
+                    "d": 3
+                },
+                "valid": false
+            }
+        ]
+    },
+    {
+        "description": "Dependencies (properties)",
+        "schema": {
+            "type": "object",
+            "properties": {
+                "name": { "type": "string" },
+                "credit_card": { "type": "number" },
+                "billing_address": { "type": "string" }
+            },
+            "required": ["name"],
+            "dependencies": {
+                "credit_card": ["billing_address"]
+            }
+        },
+        "tests": [
+            {
+                "data": {
+                    "name": "John Doe",
+                    "credit_card": 5555555555555555,
+                    "billing_address": "555 Debtor's Lane"
+                },
+                "valid": true
+            },
+            {
+                "data": {
+                    "name": "John Doe",
+                    "credit_card": 5555555555555555
+                },
+                "valid": false
+            },
+            {
+                "data": {
+                    "name": "John Doe"
+                },
+                "valid": true
+            },
+            {
+                "data": {
+                    "name": "John Doe",
+                    "billing_address": "555 Debtor's Lane"
+                },
+                "valid": true
+            }
+        ]
+    },
+    {
+        "description": "Dependencies (complex properties)",
+        "schema": {
+            "type": "object",
+            "properties": {
+                "name": { "type": "string" },
+                "credit_card": { "type": "number" },
+                "billing_address": { "type": "string" }
+            },
+            "required": ["name"],
+            "dependencies": {
+                "credit_card": ["billing_address"],
+                "billing_address": ["credit_card"]
+            }
+        },
+        "tests": [
+            {
+                "data": {
+                    "name": "John Doe",
+                    "credit_card": 5555555555555555
+                },
+                "valid": false
+            },
+            {
+                "data": {
+                    "name": "John Doe",
+                    "billing_address": "555 Debtor's Lane"
+                },
+                "valid": false
+            }
+        ]
+    },
+    {
+        "description": "Schema dependencies",
+        "schema": {
+            "type": "object",
+            "properties": {
+                "name": { "type": "string" },
+                "credit_card": { "type": "number" }
+            },
+            "required": ["name"],
+            "dependencies": {
+                "credit_card": {
+                    "properties": {
+                        "billing_address": { "type": "string" }
+                    },
+                    "required": ["billing_address"]
+                }
+            }
+        },
+        "tests": [
+            {
+                "data": {
+                    "name": "John Doe",
+                    "credit_card": 5555555555555555,
+                    "billing_address": "555 Debtor's Lane"
+                },
+                "valid": true
+            },
+            {
+                "data": {
+                    "name": "John Doe",
+                    "credit_card": 5555555555555555
+                },
+                "valid": false
+            },
+            {
+                "data": {
+                    "name": "John Doe",
+                    "billing_address": "555 Debtor's Lane"
+                },
+                "valid": true
+            }
+        ]
+    },
+    {
+        "description": "Pattern Properties",
+        "schema": {
+            "type": "object",
+            "patternProperties": {
+                "^S_": { "type": "string" },
+                "^I_": { "type": "integer" }
+            }
+        },
+        "tests": [
+            {
+                "data": { "S_25": "This is a string" },
+                "valid": true
+            },
+            {
+                "data": { "I_0": 42 },
+                "valid": true
+            },
+            {
+                "data": { "S_0": 42 },
+                "valid": false
+            },
+            {
+                "data": { "I_42": "This is a string" },
+                "valid": false
+            },
+            {
+                "data": { "keyword": "value" },
+                "valid": true
+            }
+        ]
+    }
+]
