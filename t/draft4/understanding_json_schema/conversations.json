@@ -1,0 +1,35 @@
+[
+    {
+        "description": "conversations",
+        "schema": {
+            "type": "number"
+        },
+        "tests": [
+            {
+                "description": "42 (integer)",
+                "data": 42,
+                "valid": true
+            },
+            {
+                "description": "-1 (integer)",
+                "data": 42,
+                "valid": true
+            },
+            {
+                "description": "5.0 (number)",
+                "data": 5.0,
+                "valid": true
+            },
+            {
+                "description": "2.99792458e8 (number)",
+                "data": 2.99792458e8,
+                "valid": true
+            },
+            {
+                "description": "42 (string)",
+                "data": "42",
+                "valid": false
+            }
+        ]
+    }
+]

@@ -1,0 +1,177 @@
+[
+    {
+        "description": "array",
+        "schema": {
+            "type": "array"
+        },
+        "tests": [
+            {
+                "data": [1, 2, 3, 4, 5],
+                "valid": true
+            },
+            {
+                "data": [3, "different", { "types" : "of values" }],
+                "valid": true
+            },
+            {
+                "data": { "Not": "an array" },
+                "valid": false
+            }
+        ]
+    },
+    {
+        "description": "List validation",
+        "schema": {
+            "type": "array",
+            "items": {
+                "type": "number"
+            }
+        },
+        "tests": [
+            {
+                "data": [1, 2, 3, 4, 5],
+                "valid": true
+            },
+            {
+                "data": [1, 2, "3", 4, 5],
+                "valid": false
+            },
+            {
+                "data": [],
+                "valid": true
+            }
+        ]
+    },
+    {
+        "description": "Tuple validation",
+        "schema": {
+            "type": "array",
+            "items": [
+                {
+                    "type": "number"
+                },
+                {
+                    "type": "string"
+                },
+                {
+                    "type": "string",
+                    "enum": ["Street", "Avenue", "Boulevard"]
+                },
+                {
+                    "type": "string",
+                    "enum": ["NW", "NE", "SW", "SE"]
+                }
+            ]
+        },
+        "tests": [
+            {
+                "data": [1600, "Pennsylvania", "Avenue", "NW"],
+                "valid": true
+            },
+            {
+                "data": [24, "Sussex", "Drive"],
+                "valid": false
+            },
+            {
+                "data": ["Palais de l'Élysée"],
+                "valid": false
+            },
+            {
+                "data": [10, "Downing", "Street"],
+                "valid": true
+            },
+            {
+                "data": [1600, "Pennsylvania", "Avenue", "NW", "Washington"],
+                "valid": true
+            }
+        ]
+    },
+    {
+        "description": "Tuple validation (additionalItems)",
+        "schema": {
+            "type": "array",
+            "items": [
+                {
+                    "type": "number"
+                },
+                {
+                    "type": "string"
+                },
+                {
+                    "type": "string",
+                    "enum": ["Street", "Avenue", "Boulevard"]
+                },
+                {
+                    "type": "string",
+                    "enum": ["NW", "NE", "SW", "SE"]
+                }
+            ],
+            "additionalItems": false
+        },
+        "tests": [
+            {
+                "data": [1600, "Pennsylvania", "Avenue", "NW"],
+                "valid": true
+            },
+            {
+                "data": [1600, "Pennsylvania", "Avenue"],
+                "valid": true
+            },
+            {
+                "data": [1600, "Pennsylvania", "Avenue", "NW", "Washington"],
+                "valid": false
+            }
+        ]
+    },
+    {
+        "description": "Length",
+        "schema": {
+            "type": "array",
+            "minItems": 2,
+            "maxItems": 3
+        },
+        "tests": [
+            {
+                "data": [],
+                "valid": false
+            },
+            {
+                "data": [1],
+                "valid": false
+            },
+            {
+                "data": [1, 2],
+                "valid": true
+            },
+            {
+                "data": [1, 2, 3],
+                "valid": true
+            },
+            {
+                "data": [1, 2, 3, 4],
+                "valid": false
+            }
+        ]
+    },
+    {
+        "description": "Uniqueness",
+        "schema": {
+            "type": "array",
+            "uniqueItems": true
+        },
+        "tests": [
+            {
+                "data": [1, 2, 3, 4, 5],
+                "valid": true
+            },
+            {
+                "data": [1, 2, 3, 3, 4],
+                "valid": false
+            },
+            {
+                "data": [],
+                "valid": true
+            }
+        ]
+    }
+]
