@@ -1,0 +1,48 @@
+[
+    {
+        "description": "about",
+        "schema": {
+            "type": "object",
+            "properties": {
+                "first_name": { "type": "string" },
+                "last_name": { "type": "string" },
+                "birthday": { "type": "string", "format": "date-time" },
+                "address": {
+                    "type": "object",
+                    "properties": {
+                        "street_address": { "type": "string" },
+                        "city": { "type": "string" },
+                        "state": { "type": "string" },
+                        "country": { "type" : "string" }
+                    }
+                }
+            }
+        },
+        "tests": [
+            {
+                "description": "invalid",
+                "data": {
+                    "name": "George Washington",
+                    "birthday": "February 22, 1732",
+                    "address": "Mount Vernon, Virginia, United States"
+                },
+                "valid": false
+            },
+            {
+                "description": "valid",
+                "data": {
+                    "first_name": "George",
+                    "last_name": "Washington",
+                    "birthday": "22-02-1732",
+                    "address": {
+                        "street_address": "3200 Mount Vernon Memorial Highway",
+                        "city": "Mount Vernon",
+                        "state": "Virginia",
+                        "country": "United States"
+                    }
+                },
+                "valid": true
+            }
+        ]
+    }
+]
