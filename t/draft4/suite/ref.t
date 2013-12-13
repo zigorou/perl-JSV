@@ -9,7 +9,7 @@ use JSV::Validator;
 my $validator = JSV::Validator->new;
 
 ### TODO: Maybe commonize
-open(my $fh, "<", "t/draft4/schema") or die $!;
+open(my $fh, "<", "t/draft4/suite/schema") or die $!;
 my $core_schema = decode_json(do { local $/; <$fh> });
 $validator->register_schema(
     $core_schema->{id},
