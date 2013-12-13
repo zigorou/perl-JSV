@@ -1,0 +1,48 @@
+[
+    {
+        "description": "simple example of using type keyword",
+        "schema": {
+            "type": "number"
+        },
+        "tests": [
+            {
+                "description": "42 (integer)",
+                "data": 42,
+                "valid": true
+            },
+            {
+                "description": "42.0 (number)",
+                "data": 42.0,
+                "valid": true
+            },
+            {
+                "description": "42 (string)",
+                "data": "42",
+                "valid": false
+            }
+        ]
+    },
+    {
+        "description": "we accept strings and numbers, but not structured data types",
+        "schema": {
+            "type": ["number", "string"]
+        },
+        "tests": [
+            {
+                "description": "42 (integer)",
+                "data": 42,
+                "valid": true
+            },
+            {
+                "description": "Life, the universe, and everything",
+                "data": "Life, the universe, and everything",
+                "valid": true
+            },
+            {
+                "description": "array",
+                "data": ["Life", "the universe", "and everything"],
+                "valid": false
+            }
+        ]
+    }
+]
