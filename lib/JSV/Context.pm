@@ -41,33 +41,35 @@ sub validate {
 
     my $rv;
     eval {
-        for (@{ $self->keywords->{INSTANCE_TYPE_ANY()} }) {
-            next unless exists $schema->{$_->keyword};
-            $self->apply_keyword($_, $schema, $instance);
+        for my $keyword (@{ $self->keywords->{INSTANCE_TYPE_ANY()} }) {
+            next unless exists $schema->{$keyword->keyword};
+            $self->apply_keyword($keyword, $schema, $instance);
         }
 
         if ($self->is_matched_types(qw/integer number/)) {
-            for (@{ $self->keywords->{INSTANCE_TYPE_NUMERIC()} }) {
-                next unless exists $schema->{$_->keyword};
-                $self->apply_keyword($_, $schema, $instance);
+            for my $keyword (@{ $self->keywords->{INSTANCE_TYPE_NUMERIC()} }) {
+                next unless exists $schema->{$keyword->keyword};
+                $self->apply_keyword($keyword, $schema, $instance);
             }
         }
         elsif ($self->is_matched_types( $self->{loose_type} ? qw/string integer number/ : qw/string/ )) {
-            for (@{ $self->keywords->{INSTANCE_TYPE_STRING()} }) {
-                next unless exists $schema->{$_->keyword};
-                $self->apply_keyword($_, $schema, $instance);
+            for my $keyword (@{ $self->keywords->{INSTANCE_TYPE_STRING()} }) {
+                next unless exists $schema->{$keyword->keyword};
+                $self->apply_keyword($keyword, $schema, $instance);
             }
         }
         elsif ($self->current_type eq "array") {
-            for (@{ $self->keywords->{INSTANCE_TYPE_ARRAY()} }) {
-                next unless exists $schema->{$_->keyword};
-                $self->apply_keyword($_, $schema, $instance);
+            for my $keyword (@{ $self->keywords->{INSTANCE_TYPE_ARRAY()} }) {
+                next unless exists $schema->{$keyword->keyword};
+                $self->apply_keyword($keyword, $schema, $instance);
             }
         }
         elsif ($self->current_type eq "object") {
-            for (@{ $self->keywords->{INSTANCE_TYPE_OBJECT()} }) {
-                next unless exists $schema->{$_->keyword};
-                $self->apply_keyword($_, $schema, $instance);
+            for my $keyword (@{ $self->keywords->{INSTANCE_TYPE_OBJECT()} }) {
+                ### for addtionalProperties, patternProperties keyword without properties keyword
+                next unless ( ( grep { defined $_ && exists $schema->{$_} } ($keyword->keyword, @{$keyword->additional_keywords}) ) > 0 );
+                # next unless exists $schema->{$_->keyword};
+                $self->apply_keyword($keyword, $schema, $instance);
             }
         }
 
@@ -91,11 +93,11 @@ sub validate {
 sub apply_keyword {
     my ($self, $keyword, $schema, $instance) = @_;
 
-    local $self->{current_keyword}  = $_->keyword;
+    local $self->{current_keyword}  = $keyword->keyword;
     local $self->{current_schema}   = $schema;
     local $self->{current_instance} = $instance;
 
-    $_->validate($self, $schema, $instance);
+    $keyword->validate($self, $schema, $instance);
 
     if ( $ENV{JSV_DEBUG} || $self->enable_history ) {
         push @{ $self->history }, +{

@@ -389,5 +389,33 @@
                 "valid": true
             }
         ]
+    },
+    {
+        "description": "Pattern Properties and Additional Properties",
+        "schema": {
+            "type": "object",
+            "properties": {
+                "builtin": { "type": "number" }
+            },
+            "patternProperties": {
+                "^S_": { "type": "string" },
+                "^I_": { "type": "integer" }
+            },
+            "additionalProperties": { "type": "string" }
+        },
+        "tests": [
+            {
+                "data": { "builtin": 42 },
+                "valid": true
+            },
+            {
+                "data": { "keyword": "value" },
+                "valid": true
+            },
+            {
+                "data": { "keyword": 42 },
+                "valid": false
+            }
+        ]
     }
 ]
