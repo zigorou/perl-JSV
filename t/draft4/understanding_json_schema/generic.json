@@ -1,0 +1,60 @@
+[
+    {
+        "description": "Enumerated values (1)",
+        "schema": {
+            "type": "string",
+            "enum": ["red", "amber", "green"]
+        },
+        "tests": [
+            {
+                "data": "red",
+                "valid": true
+            },
+            {
+                "data": "blue",
+                "valid": false
+            }
+        ]
+    },
+    {
+        "description": "Enumerated values (2)",
+        "schema": {
+            "enum": ["red", "amber", "green", null, 42]
+        },
+        "tests": [
+            {
+                "data": "red",
+                "valid": true
+            },
+            {
+                "data": null,
+                "valid": true
+            },
+            {
+                "data": 42,
+                "valid": true
+            },
+            {
+                "data": 0,
+                "valid": false
+            }
+        ]
+    },
+    {
+        "description": "Enumerated values (3)",
+        "schema": {
+            "type": "string",
+            "enum": ["red", "amber", "green", null]
+        },
+        "tests": [
+            {
+                "data": "red",
+                "valid": true
+            },
+            {
+                "data": null,
+                "valid": false
+            }
+        ]
+    }
+]
