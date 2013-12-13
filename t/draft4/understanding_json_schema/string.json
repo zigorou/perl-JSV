@@ -1,0 +1,81 @@
+[
+    {
+        "description": "string",
+        "schema": {
+            "type": "string"
+        },
+        "tests": [
+            {
+                "description": "This is a string",
+                "data": "This is a string",
+                "valid": true
+            },
+            {
+                "description": "Unicode characters",
+                "data": "Déjà vu",
+                "valid": true
+            },
+            {
+                "description": "42 (string)",
+                "data": "42",
+                "valid": true
+            },
+            {
+                "description": "42 (integer)",
+                "data": 42,
+                "valid": false
+            }
+        ]
+    },
+    {
+        "description": "Length",
+        "schema": {
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 3
+        },
+        "tests": [
+            {
+                "data": "A",
+                "valid": false
+            },
+            {
+                "data": "AB",
+                "valid": true
+            },
+            {
+                "data": "ABC",
+                "valid": true
+            },
+            {
+                "data": "ABCD",
+                "valid": false
+            }
+        ]
+    },
+    {
+        "description": "Regular Expressions",
+        "schema": {
+            "type": "string",
+            "pattern": "^(\\([0-9]{3}\\))?[0-9]{3}-[0-9]{4}$"
+        },
+        "tests": [
+            {
+                "data": "555-1212",
+                "valid": true
+            },
+            {
+                "data": "(888)555-1212",
+                "valid": true
+            },
+            {
+                "data": "(888)555-1212 ext. 532",
+                "valid": false
+            },
+            {
+                "data": "(800)FLOWERS",
+                "valid": false
+            }
+        ]
+    }
+]
