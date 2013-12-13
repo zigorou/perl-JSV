@@ -23,6 +23,8 @@ use JSV::Reference;
 use JSV::Context;
 use Module::Pluggable::Object;
 
+our $VERSION = "0.02";
+
 my %supported_environments = (
     draft4 => "Draft4"
 );
@@ -61,8 +63,8 @@ sub new {
     my %args  = @_;
     %args = (
         environment     => 'draft4',
-        enable_history  => 0,
         enable_format   => 1,
+        enable_history  => 0,
         reference       => JSV::Reference->new,
         formats         => +{
             'date-time' => sub {
@@ -105,7 +107,13 @@ sub new {
 }
 
 sub validate {
-    my ($self, $schema, $instance) = @_;
+    my ($self, $schema, $instance, $opts) = @_;
+
+    $opts ||= +{};
+    %$opts = (
+        loose_type => 0,
+        %$opts,
+    );
 
     my $context = JSV::Context->new(
         keywords               => +{
@@ -127,6 +135,7 @@ sub validate {
         errors           => [],
         current_pointer  => "",
         json             => JSON->new->allow_nonref,
+        loose_type       => $opts->{loose_type},
     );
 
     return $context->validate($schema, $instance);

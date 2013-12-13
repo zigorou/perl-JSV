@@ -16,6 +16,7 @@ use Class::Accessor::Lite (
         formats
         history
         json
+        loose_type
     /],
     ro  => [qw/
         errors
@@ -33,7 +34,6 @@ use JSV::Keyword qw(:constants);
 use JSV::Util::Type qw(detect_instance_type);
 use JSV::Result;
 
-
 sub validate {
     my ($self, $schema, $instance) = @_;
 
@@ -46,13 +46,13 @@ sub validate {
             $self->apply_keyword($_, $schema, $instance);
         }
 
-        if ($self->current_type eq "integer" || $self->current_type eq "number") {
+        if ($self->is_matched_types(qw/integer number/)) {
             for (@{ $self->keywords->{INSTANCE_TYPE_NUMERIC()} }) {
                 next unless exists $schema->{$_->keyword};
                 $self->apply_keyword($_, $schema, $instance);
             }
         }
-        elsif ($self->current_type eq "string") {
+        elsif ($self->is_matched_types( $self->{loose_type} ? qw/string integer number/ : qw/string/ )) {
             for (@{ $self->keywords->{INSTANCE_TYPE_STRING()} }) {
                 next unless exists $schema->{$_->keyword};
                 $self->apply_keyword($_, $schema, $instance);
@@ -152,6 +152,11 @@ sub resolve_current_instance {
     }
 
     return $instance;
+}
+
+sub is_matched_types {
+    my ($self, @types) = @_;
+    return (grep { $self->{current_type} eq $_ } @types) > 0 ? 1 : 0;
 }
 
 1;

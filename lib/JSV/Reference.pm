@@ -56,6 +56,10 @@ sub get_schema {
     my ($normalized_uri, $fragment) = $self->normalize_uri($uri);
     my $schema = $self->{registered_schema_map}{$normalized_uri} || $opts->{root};
 
+    if (exists $schema->{'$ref'} && $schema->{'$ref'} eq $normalized_uri) {
+        die sprintf("cannot resolve reference: uri = %s", $uri);
+    }
+
     if ( $fragment ) {
         eval {
             $schema = JSON::Pointer->get($schema, $fragment, 1);
