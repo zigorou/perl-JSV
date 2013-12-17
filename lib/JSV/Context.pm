@@ -145,11 +145,11 @@ sub resolve_current_instance {
     my $self = shift;
 
     my $instance;
-    if ( ref $self->current_instance ) {
+    if ( JSON::is_bool($self->current_instance) ) {
         if ( $self->current_instance == JSON::true ) {
             $instance = "true";
         }
-        elsif ( $self->current_instance == JSON::false ) {
+        else {
             $instance = "false";
         }
     }
