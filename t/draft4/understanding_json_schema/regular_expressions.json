@@ -1,0 +1,27 @@
+[
+    {
+        "description": "Regular Expressions",
+        "schema": {
+            "type": "string",
+            "pattern": "^(\\([0-9]{3}\\))?[0-9]{3}-[0-9]{4}$"
+        },
+        "tests": [
+            {
+                "data": "555-1212",
+                "valid": true
+            },
+            {
+                "data": "(888)555-1212",
+                "valid": true
+            },
+            {
+                "data": "(888)555-1212 ext. 532",
+                "valid": false
+            },
+            {
+                "data": "(800)FLOWERS",
+                "valid": false
+            }
+        ]
+    }
+]

@@ -39,6 +39,8 @@ sub keyword {
     croak "keyword method is abstract method";
 }
 
+sub additional_keywords { return []; }
+
 sub keyword_priority {
     croak "keyword_priority method is abstract method";
 }

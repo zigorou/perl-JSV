@@ -1,0 +1,135 @@
+[
+    {
+        "description": "integer",
+        "schema": {
+            "type": "integer"
+        },
+        "tests": [
+            {
+                "data": 42,
+                "valid": true
+            },
+            {
+                "data": -1,
+                "valid": true
+            },
+            {
+                "data": 3.1415926,
+                "valid": false
+            },
+            {
+                "data": "42",
+                "valid": false
+            }
+        ]
+    },
+    {
+        "description": "number and multipleOf",
+        "schema": {
+            "type": "number",
+            "multipleOf": 1.0
+        },
+        "tests": [
+            {
+                "data": 42,
+                "valid": true
+            },
+            {
+                "data": 42.0,
+                "valid": true
+            },
+            {
+                "data": 3.1415926,
+                "valid": false
+            }
+        ]
+    },
+    {
+        "description": "number",
+        "schema": {
+            "type": "number"
+        },
+        "tests": [
+            {
+                "data": 42,
+                "valid": true
+            },
+            {
+                "data": -1,
+                "valid": true
+            },
+            {
+                "data": 5.0,
+                "valid": true
+            },
+            {
+                "data": 2.99792458e8,
+                "valid": true
+            },
+            {
+                "data": "42",
+                "valid": false
+            }
+        ]
+    },
+    {
+        "description": "Multiples",
+        "schema": {
+            "type": "number",
+            "multipleOf": 10
+        },
+        "tests": [
+            {
+                "data": 0,
+                "valid": true
+            },
+            {
+                "data": 10,
+                "valid": true
+            },
+            {
+                "data": 20,
+                "valid": true
+            },
+            {
+                "data": 23,
+                "valid": false
+            }
+        ]
+    },
+    {
+        "description": "Range",
+        "schema": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 100,
+            "exclusiveMaximum": true
+        },
+        "tests": [
+            {
+                "data": -1,
+                "valid": false
+            },
+            {
+                "data": 0,
+                "valid": true
+            },
+            {
+                "data": 10,
+                "valid": true
+            },
+            {
+                "data": 99,
+                "valid": true
+            },
+            {
+                "data": 100,
+                "valid": false
+            },
+            {
+                "data": 101,
+                "valid": false
+            }
+        ]
+    }
+]

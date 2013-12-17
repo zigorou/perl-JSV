@@ -1,0 +1,137 @@
+[
+    {
+        "description": "anyOf",
+        "schema": {
+            "anyOf": [
+                { "type": "string", "maxLength": 5 },
+                { "type": "number", "minimum": 0 }
+            ]
+        },
+        "tests": [
+            {
+                "data": "short",
+                "valid": true
+            },
+            {
+                "data": "too long",
+                "valid": false
+            },
+            {
+                "data": 12,
+                "valid": true
+            },
+            {
+                "data": -5,
+                "valid": false
+            }
+        ]
+    },
+    {
+        "description": "allOf (1)",
+        "schema": {
+            "allOf": [
+                { "type": "string" },
+                { "maxLength": 5 }
+            ]
+        },
+        "tests": [
+            {
+                "data": "short",
+                "valid": true
+            },
+            {
+                "data": "too long",
+                "valid": false
+            }
+        ]
+    },
+    {
+        "description": "allOf (2)",
+        "schema": {
+            "allOf": [
+                 { "type": "string" },
+                { "type": "number" }
+            ]
+        },
+        "tests": [
+            {
+                "data": "No way",
+                "valid": false
+            },
+            {
+                "data": -1,
+                "valid": false
+            }
+        ]
+    },
+    {
+        "description": "anyOf",
+        "schema": {
+            "anyOf": [
+                { "type": "string" },
+                { "type": "number" }
+            ]
+        },
+        "tests": [
+            {
+                "data": "Yes",
+                "valid": true
+            },
+            {
+                "data": 42,
+                "valid": true
+            },
+            {
+                "data": { "Not a": "string or number" },
+                "valid": false
+            }
+        ]
+    },
+    {
+        "description": "oneOf",
+        "schema": {
+            "oneOf": [
+                { "type": "number", "multipleOf": 5 },
+                { "type": "number", "multipleOf": 3 }
+            ]
+        },
+        "tests": [
+            {
+                "data": 10,
+                "valid": true
+            },
+            {
+                "data": 9,
+                "valid": true
+            },
+            {
+                "data": 2,
+                "valid": false
+            },
+            {
+                "data": 15,
+                "valid": false
+            }
+        ]
+    },
+    {
+        "description": "not",
+        "schema": {
+            "not": { "type": "string" }
+        },
+        "tests": [
+            {
+                "data": 42,
+                "valid": true
+            },
+            {
+                "data": { "key": "value" },
+                "valid": true
+            },
+            {
+                "data": "I am a string",
+                "valid": false
+            }
+        ]
+    }
+]

@@ -1,0 +1,26 @@
+[
+    {
+        "description": "boolean",
+        "schema": {
+            "type": "boolean"
+        },
+        "tests": [
+            {
+                "data": true,
+                "valid": true
+            },
+            {
+                "data": false,
+                "valid": true
+            },
+            {
+                "data": "true",
+                "valid": false
+            },
+            {
+                "data": 0,
+                "valid": false
+            }
+        ]
+    }
+]

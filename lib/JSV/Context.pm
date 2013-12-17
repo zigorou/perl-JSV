@@ -16,6 +16,7 @@ use Class::Accessor::Lite (
         formats
         history
         json
+        loose_type
     /],
     ro  => [qw/
         errors
@@ -33,7 +34,6 @@ use JSV::Keyword qw(:constants);
 use JSV::Util::Type qw(detect_instance_type);
 use JSV::Result;
 
-
 sub validate {
     my ($self, $schema, $instance) = @_;
 
@@ -41,33 +41,35 @@ sub validate {
 
     my $rv;
     eval {
-        for (@{ $self->keywords->{INSTANCE_TYPE_ANY()} }) {
-            next unless exists $schema->{$_->keyword};
-            $self->apply_keyword($_, $schema, $instance);
+        for my $keyword (@{ $self->keywords->{INSTANCE_TYPE_ANY()} }) {
+            next unless exists $schema->{$keyword->keyword};
+            $self->apply_keyword($keyword, $schema, $instance);
         }
 
-        if ($self->current_type eq "integer" || $self->current_type eq "number") {
-            for (@{ $self->keywords->{INSTANCE_TYPE_NUMERIC()} }) {
-                next unless exists $schema->{$_->keyword};
-                $self->apply_keyword($_, $schema, $instance);
+        if ($self->is_matched_types(qw/integer number/)) {
+            for my $keyword (@{ $self->keywords->{INSTANCE_TYPE_NUMERIC()} }) {
+                next unless exists $schema->{$keyword->keyword};
+                $self->apply_keyword($keyword, $schema, $instance);
             }
         }
-        elsif ($self->current_type eq "string") {
-            for (@{ $self->keywords->{INSTANCE_TYPE_STRING()} }) {
-                next unless exists $schema->{$_->keyword};
-                $self->apply_keyword($_, $schema, $instance);
+        elsif ($self->is_matched_types( $self->{loose_type} ? qw/string integer number/ : qw/string/ )) {
+            for my $keyword (@{ $self->keywords->{INSTANCE_TYPE_STRING()} }) {
+                next unless exists $schema->{$keyword->keyword};
+                $self->apply_keyword($keyword, $schema, $instance);
             }
         }
         elsif ($self->current_type eq "array") {
-            for (@{ $self->keywords->{INSTANCE_TYPE_ARRAY()} }) {
-                next unless exists $schema->{$_->keyword};
-                $self->apply_keyword($_, $schema, $instance);
+            for my $keyword (@{ $self->keywords->{INSTANCE_TYPE_ARRAY()} }) {
+                next unless exists $schema->{$keyword->keyword};
+                $self->apply_keyword($keyword, $schema, $instance);
             }
         }
         elsif ($self->current_type eq "object") {
-            for (@{ $self->keywords->{INSTANCE_TYPE_OBJECT()} }) {
-                next unless exists $schema->{$_->keyword};
-                $self->apply_keyword($_, $schema, $instance);
+            for my $keyword (@{ $self->keywords->{INSTANCE_TYPE_OBJECT()} }) {
+                ### for addtionalProperties, patternProperties keyword without properties keyword
+                next unless ( ( grep { defined $_ && exists $schema->{$_} } ($keyword->keyword, @{$keyword->additional_keywords}) ) > 0 );
+                # next unless exists $schema->{$_->keyword};
+                $self->apply_keyword($keyword, $schema, $instance);
             }
         }
 
@@ -95,11 +97,11 @@ sub validate {
 sub apply_keyword {
     my ($self, $keyword, $schema, $instance) = @_;
 
-    local $self->{current_keyword}  = $_->keyword;
+    local $self->{current_keyword}  = $keyword->keyword;
     local $self->{current_schema}   = $schema;
     local $self->{current_instance} = $instance;
 
-    $_->validate($self, $schema, $instance);
+    $keyword->validate($self, $schema, $instance);
 
     if ( $ENV{JSV_DEBUG} || $self->enable_history ) {
         push @{ $self->history }, +{
@@ -156,6 +158,11 @@ sub resolve_current_instance {
     }
 
     return $instance;
+}
+
+sub is_matched_types {
+    my ($self, @types) = @_;
+    return (grep { $self->{current_type} eq $_ } @types) > 0 ? 1 : 0;
 }
 
 1;
