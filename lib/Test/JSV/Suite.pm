@@ -19,7 +19,7 @@ sub run {
         version                     => "",
         suite                       => "type",
         cb                          => sub {
-            my ($schema, $instance) = @_;
+            my ($schema, $instance, $expect) = @_;
             return 1;
         },
         verbose                     => 0,
@@ -62,7 +62,7 @@ sub run_test_case {
     my ($desc, $data, $expect) = @$test_case{qw/description data valid/};
 
     is(
-        $self->{cb}->($schema, $data),
+        $self->{cb}->($schema, $data, $expect),
         $expect ? 1 : 0,
         $desc,
     );
