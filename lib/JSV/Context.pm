@@ -75,6 +75,10 @@ sub validate {
             ($self->enable_history ? (history => $self->history) : ()),
         );
     };
+    if ( my $e = $@ ) {
+        $self->log_error(sprintf("Unexpected error: %s", $e));
+    }
+
     if ( scalar @{ $self->errors } ) {
         $rv = JSV::Result->new(
             errors => $self->errors,
