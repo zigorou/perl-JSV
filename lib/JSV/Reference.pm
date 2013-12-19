@@ -64,8 +64,11 @@ sub get_schema {
         eval {
             $schema = JSON::Pointer->get($schema, $fragment, 1);
         };
-        if (my $e = $@) {
-            die sprintf("cannot resolve reference: uri = %s, msg = %s", $uri, $e);
+        if (my $e = $@ ) {
+            die sprintf("cannot resolve reference fragment: uri = %s, msg = %s", $uri, $e);
+        }
+        elsif (!$schema) {
+            die sprintf("cannot resolve reference fragment: uri = %s, msg = %s", $uri);
         }
     }
 
