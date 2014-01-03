@@ -7,7 +7,7 @@ use parent qw(JSV::Keyword);
 use JSON;
 
 use JSV::Keyword qw(:constants);
-use JSV::Util::Type qw(detect_instance_type);
+use JSV::Util::Type qw(detect_instance_type escape_json_pointer);
 
 sub instance_type() { INSTANCE_TYPE_ARRAY(); }
 sub keyword() { "items" }
@@ -24,13 +24,13 @@ sub validate {
 
     if ($items_type eq "object") { ### items as schema
         for (my $i = 0, my $l = scalar @$instance; $i < $l; $i++) {
-            local $context->{current_pointer} .= "/" . $i;
+            local $context->{current_pointer} = $context->{current_pointer} . "/" . escape_json_pointer( $i );
             $context->validate($items, $instance->[$i]);
         }
     }
     elsif ($items_type eq "array") { ### items as schema array
         for (my $i = 0, my $l = scalar @$instance; $i < $l; $i++) {
-            local $context->{current_pointer} .= "/" . $i;
+            local $context->{current_pointer} = $context->{current_pointer} . "/" . escape_json_pointer( $i );
 
             if (defined $items->[$i]) {
                 $context->validate($items->[$i], $instance->[$i]);
