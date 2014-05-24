@@ -10,7 +10,7 @@ use Scalar::Util qw(blessed);
 use JSON;
 
 our @EXPORT_OK = (
-    qw/detect_instance_type/
+    qw/detect_instance_type loose_type_match/
 );
 
 our %REF_TYPE_MAP = (
@@ -53,6 +53,17 @@ sub detect_instance_type {
             croak(sprintf("Unknown type (flags: %s)", $flags));
         }
     }
+}
+
+sub loose_type_match {
+    my ($type1, $type2) = @_;
+
+    my @scalar_types = qw/boolean integer number string/;
+
+    return unless grep { $type1 eq $_ } @scalar_types;
+    return unless grep { $type2 eq $_ } @scalar_types;
+
+    return 1;
 }
 
 1;
