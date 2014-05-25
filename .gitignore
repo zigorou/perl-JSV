@@ -26,3 +26,8 @@ MYMETA.*
 /JSV-*
 
 t.pl
+/.build
+/_build_params
+/Build.bat
+!Build/
+!META.json
