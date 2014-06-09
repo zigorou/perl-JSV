@@ -40,11 +40,6 @@ sub validate_singular_type {
         return 1;
     }
     else {
-        if ($context->loose_type && $given_type eq "string" && looks_like_number($instance)) {
-            return 1 if ($schema_type eq "number");
-            return 1 if ($schema_type eq "integer" && $instance =~ m/^(?:[+-])?[1-9]?\d+$/);
-        }
-
         return 0;
     }
 }
