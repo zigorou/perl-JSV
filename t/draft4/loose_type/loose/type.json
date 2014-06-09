@@ -1,0 +1,65 @@
+[
+    {
+        "description": "integer type matches integers with loose type",
+        "schema": {"type": "integer"},
+        "tests": [
+            {
+                "description": "looks like integer",
+                "data": "1",
+                "valid": true
+            },
+            {
+                "description": "looks like float is not treated as an integer",
+                "data": "1.1",
+                "valid": false
+            },
+            {
+                "description": "a string is not an integer",
+                "data": "foo",
+                "valid": false
+            }
+        ]
+    },
+    {
+        "description": "number type matches numbers with loose type",
+        "schema": {"type": "number"},
+        "tests": [
+            {
+                "description": "an integer is a number",
+                "data": "1",
+                "valid": true
+            },
+            {
+                "description": "a float is a number",
+                "data": "1.1",
+                "valid": true
+            },
+            {
+                "description": "a string is not a number",
+                "data": "foo",
+                "valid": false
+            }
+        ]
+    },
+    {
+        "description": "string type matches strings with loose type",
+        "schema": {"type": "string"},
+        "tests": [
+            {
+                "description": "",
+                "data": 1,
+                "valid": true
+            },
+            {
+                "description": "",
+                "data": 1.1,
+                "valid": true
+            },
+            {
+                "description": "a string is a string",
+                "data": "foo",
+                "valid": true
+            }
+        ]
+    }
+]
