@@ -12,9 +12,12 @@ use Test::JSV::Suite;
 use JSV::Validator;
 use URI;
 
+use File::Spec;
+use File::Basename;
+
 my $validator = JSV::Validator->new;
 
-my $base_dir = File::Spec->catdir(dirname(__FILE__), "../suite/remotes");
+my $base_dir = File::Spec->catdir(dirname(__FILE__), "../../suite/remotes");
 find(
     +{
         wanted => sub {
@@ -43,6 +46,7 @@ TODO: {
 
     subtest "strict type" => sub {
         Test::JSV::Suite->run(
+            base_dir => File::Spec->catdir(File::Spec->no_upwards(dirname(__FILE__), "../../suite/tests")),
             version => "draft4",
             suite   => "refRemote",
             cb      => sub {
@@ -54,6 +58,7 @@ TODO: {
 
     subtest "loose type" => sub {
         Test::JSV::Suite->run(
+            base_dir => File::Spec->catdir(File::Spec->no_upwards(dirname(__FILE__), "../../suite/tests")),
             version => "draft4",
             suite   => "refRemote",
             cb      => sub {
