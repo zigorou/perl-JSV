@@ -31,13 +31,14 @@ use Class::Accessor::Lite (
 use Carp qw(croak);
 use JSON;
 use JSV::Keyword qw(:constants);
-use JSV::Util::Type qw(detect_instance_type);
+use JSV::Util::Type qw(detect_instance_type detect_instance_type_loose);
 use JSV::Result;
 
 sub validate {
     my ($self, $schema, $instance) = @_;
 
-    local $self->{current_type} = detect_instance_type($instance);
+    local $self->{current_type} = !$self->loose_type ? detect_instance_type($instance)
+                                                     : detect_instance_type_loose($instance);
 
     my $rv;
     eval {
@@ -46,13 +47,22 @@ sub validate {
             $self->apply_keyword($keyword, $schema, $instance);
         }
 
-        if ($self->is_matched_types(qw/integer number/)) {
+        if ($self->is_matched_types(qw/integer_or_string number_or_string/)) {
+            for my $keyword (
+                @{ $self->keywords->{INSTANCE_TYPE_NUMERIC()} },
+                @{ $self->keywords->{INSTANCE_TYPE_STRING()} }
+            ) {
+                next unless exists $schema->{$keyword->keyword};
+                $self->apply_keyword($keyword, $schema, $instance);
+            }
+        }
+        elsif ($self->is_matched_types(qw/integer number/)) {
             for my $keyword (@{ $self->keywords->{INSTANCE_TYPE_NUMERIC()} }) {
                 next unless exists $schema->{$keyword->keyword};
                 $self->apply_keyword($keyword, $schema, $instance);
             }
         }
-        elsif ($self->is_matched_types( $self->{loose_type} ? qw/string integer number/ : qw/string/ )) {
+        elsif ($self->is_matched_types(qw/string/)) {
             for my $keyword (@{ $self->keywords->{INSTANCE_TYPE_STRING()} }) {
                 next unless exists $schema->{$keyword->keyword};
                 $self->apply_keyword($keyword, $schema, $instance);
@@ -162,6 +172,7 @@ sub resolve_current_instance {
 
 sub is_matched_types {
     my ($self, @types) = @_;
+
     return (grep { $self->{current_type} eq $_ } @types) > 0 ? 1 : 0;
 }
 

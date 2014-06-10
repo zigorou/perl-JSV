@@ -5,7 +5,7 @@ use warnings;
 use parent qw(JSV::Keyword);
 
 use JSV::Keyword qw(:constants);
-use JSV::Util::Type qw(detect_instance_type);
+use JSV::Util::Type qw(escape_json_pointer);
 use List::Util qw(first);
 
 sub instance_type() { INSTANCE_TYPE_OBJECT(); }
@@ -21,7 +21,7 @@ sub validate {
     for my $property (keys %$dependencies) {
         next unless (exists $instance->{$property});
 
-        local $context->{current_pointer} .= "/" . $property;
+        local $context->{current_pointer} = $context->{current_pointer} . "/" . escape_json_pointer( $property );
 
         if (ref $dependencies->{$property} eq "ARRAY") {
             my $found_against_dependency = first { !exists $instance->{$_} } @{$dependencies->{$property}};

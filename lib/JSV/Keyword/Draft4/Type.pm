@@ -7,10 +7,9 @@ use parent qw(JSV::Keyword);
 use B;
 use JSON;
 use List::Util qw(first);
-use Scalar::Util qw(blessed looks_like_number);
+use Scalar::Util qw(blessed);
 
 use JSV::Keyword qw(:constants);
-use JSV::Util::Type qw(detect_instance_type);
 
 sub instance_type() { INSTANCE_TYPE_ANY(); }
 sub keyword() { "type" }
@@ -40,11 +39,12 @@ sub validate_singular_type {
         return 1;
     }
     else {
-        if ($context->loose_type && $given_type eq "string" && looks_like_number($instance)) {
-            return 1 if ($schema_type eq "number");
-            return 1 if ($schema_type eq "integer" && $instance =~ m/^(?:[+-])?[1-9]?\d+$/);
+        if ( $given_type eq "number_or_string" ) {
+            return 1 if ( $schema_type eq "string" || $schema_type eq "number" );
         }
-
+        elsif ( $given_type eq "integer_or_string" ) {
+            return 1 if ( $schema_type eq "string" || $schema_type eq "number" || $schema_type eq "integer" );
+        }
         return 0;
     }
 }

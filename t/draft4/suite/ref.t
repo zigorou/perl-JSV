@@ -6,6 +6,9 @@ use Test::JSV::Suite;
 use JSON;
 use JSV::Validator;
 
+use File::Spec;
+use File::Basename;
+
 my $validator = JSV::Validator->new;
 
 ### TODO: Maybe commonize
@@ -19,6 +22,7 @@ close($fh);
 
 subtest "strict type" => sub {
     Test::JSV::Suite->run(
+        base_dir => File::Spec->catdir(File::Spec->no_upwards(dirname(__FILE__), "../../suite/tests")),
         version => "draft4",
         suite   => "ref",
         cb      => sub {
@@ -30,6 +34,7 @@ subtest "strict type" => sub {
 
 subtest "loose type" => sub {
     Test::JSV::Suite->run(
+        base_dir => File::Spec->catdir(File::Spec->no_upwards(dirname(__FILE__), "../../suite/tests")),
         version => "draft4",
         suite   => "ref",
         cb      => sub {

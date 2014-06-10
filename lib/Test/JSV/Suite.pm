@@ -14,14 +14,14 @@ sub run {
     my ($class, %opts) = @_;
 
     %opts = (
-        base_dir                    => File::Spec->catdir(File::Spec->no_upwards(dirname(__FILE__), "../../../t/suite/tests")),
-        version                     => "",
-        suite                       => "type",
-        cb                          => sub {
+        base_dir  => $opts{base_dir},
+        version   => "",
+        suite     => "type",
+        cb        => sub {
             my ($schema, $instance, $expect) = @_;
             return 1;
         },
-        verbose                     => 0,
+        verbose   => 0,
         %opts
     );
 

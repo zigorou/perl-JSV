@@ -4,7 +4,7 @@
       "zigorou <zigorou@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v0.8.0, CPAN::Meta::Converter version 2.132830",
+   "generated_by" : "Minilla/v1.0.0, CPAN::Meta::Converter version 2.120921",
    "license" : [
       "perl_5"
    ],
@@ -36,7 +36,8 @@
       "develop" : {
          "requires" : {
             "Test::CPAN::Meta" : "0",
-            "Test::MinimumVersion" : "0.10108",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
             "Test::Pod" : "1.41",
             "Test::Spellunker" : "v0.2.7"
          }
@@ -81,15 +82,16 @@
       },
       "homepage" : "https://github.com/zigorou/perl-JSV",
       "repository" : {
-         "url" : "https://github.com/zigorou/perl-JSV.git",
+         "type" : "git",
+         "url" : "git://github.com/zigorou/perl-JSV.git",
          "web" : "https://github.com/zigorou/perl-JSV"
       }
    },
-   "version" : "0.01",
+   "version" : "0.02",
    "x_contributors" : [
-      "maedama <klemensplatz+githhub@gmail.com>",
       "Tomohiro Mitsumune <tomohiro.mitsumune@dena.com>",
-      "Naosuke Yokoe <ankerasoy@gmail.com>",
-      "yokoe.naosuke <yokoe.naosuke@dena.jp>"
+      "yokoe.naosuke <yokoe.naosuke@dena.jp>",
+      "maedama <klemensplatz+githhub@gmail.com>",
+      "Naosuke Yokoe <ankerasoy@gmail.com>"
    ]
 }

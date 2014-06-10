@@ -20,6 +20,7 @@ subtest "strict type" => sub {
 };
 
 subtest "loose type" => sub {
+    plan skip_all => "Test cases is not suitable with loose mode";
     Test::JSV::Suite->run(
         base_dir => dirname(__FILE__),
         suite   => "basics",
