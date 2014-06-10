@@ -5,7 +5,6 @@ use warnings;
 use parent qw(JSV::Keyword);
 
 use JSV::Keyword qw(:constants);
-use JSV::Util::Type qw(detect_instance_type);
 use JSON;
 use List::MoreUtils qw(firstidx);
 
