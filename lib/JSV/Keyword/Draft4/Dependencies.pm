@@ -5,7 +5,7 @@ use warnings;
 use parent qw(JSV::Keyword);
 
 use JSV::Keyword qw(:constants);
-use JSV::Util::Type qw(detect_instance_type escape_json_pointer);
+use JSV::Util::Type qw(escape_json_pointer);
 use List::Util qw(first);
 
 sub instance_type() { INSTANCE_TYPE_OBJECT(); }

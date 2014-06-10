@@ -4,7 +4,6 @@ use strict;
 use warnings;
 
 use Carp;
-use JSV::Util::Type qw(detect_instance_type);
 use Exporter qw(import);
 
 our @EXPORT_OK = qw(
