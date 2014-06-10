@@ -40,6 +40,12 @@ sub validate_singular_type {
         return 1;
     }
     else {
+        if ( $given_type eq "number_or_string" ) {
+            return 1 if ( $schema_type eq "string" || $schema_type eq "number" );
+        }
+        elsif ( $given_type eq "integer_or_string" ) {
+            return 1 if ( $schema_type eq "string" || $schema_type eq "number" || $schema_type eq "integer" );
+        }
         return 0;
     }
 }
