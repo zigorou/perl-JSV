@@ -14,7 +14,7 @@ use URI;
 
 my $validator = JSV::Validator->new;
 
-my $base_dir = File::Spec->catdir(dirname(__FILE__), "../suite/remotes");
+my $base_dir = File::Spec->catdir(dirname(__FILE__), "../../suite/remotes");
 find(
     +{
         wanted => sub {

@@ -5,7 +5,7 @@ use warnings;
 use parent qw(JSV::Keyword);
 
 use JSV::Keyword qw(:constants);
-use JSV::Util::Type qw(detect_instance_type);
+use JSV::Util::Type qw(detect_instance_type escape_json_pointer);
 
 sub instance_type() { INSTANCE_TYPE_OBJECT(); }
 sub keyword() { 'properties' }
@@ -30,7 +30,7 @@ sub validate {
     my %s = map { $_ => undef } keys %$instance;
 
     for my $property (keys %$instance) {
-        local $context->{current_pointer} .= "/" . $property;
+        local $context->{current_pointer} = $context->{current_pointer} . "/" . escape_json_pointer( $property );
 
         if (exists $properties->{$property}) {
             $context->validate($properties->{$property}, $instance->{$property});
@@ -50,7 +50,9 @@ sub validate {
 
     if ($additional_properties_type eq "boolean" && !$additional_properties) {
         if (keys %s > 0) {
-            $context->log_error(sprintf("Not allowed properties are existence (properties: %s)", join(", ", keys %s)));
+            # TODO: provide pointer for each extra property
+            # (to avoid parsing error message and don't depend on its format)
+            $context->log_error(sprintf("Not allowed properties exist (properties: %s)", join(", ", keys %s)));
         }
     }
 }

@@ -10,7 +10,7 @@ use Scalar::Util qw(blessed);
 use JSON;
 
 our @EXPORT_OK = (
-    qw/detect_instance_type/
+    qw/detect_instance_type escape_json_pointer/
 );
 
 our %REF_TYPE_MAP = (
@@ -55,4 +55,14 @@ sub detect_instance_type {
     }
 }
 
+sub escape_json_pointer {
+    my $property = shift;
+    return unless defined $property;
+
+    # according to http://tools.ietf.org/html/rfc6901#section-4
+    $property =~ s!~!~0!g; # replace tilde first
+    $property =~ s!/!~1!g;
+
+    return $property;
+}
 1;
