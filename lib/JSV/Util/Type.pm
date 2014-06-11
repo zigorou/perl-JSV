@@ -13,7 +13,6 @@ our @EXPORT_OK = (qw/
     detect_instance_type
     detect_instance_type_loose
     escape_json_pointer
-    loose_type_match
 /);
 
 our %REF_TYPE_MAP = (
@@ -88,16 +87,4 @@ sub escape_json_pointer {
 
     return $property;
 }
-
-sub loose_type_match {
-    my ($type1, $type2) = @_;
-
-    my @scalar_types = qw/boolean integer number string/;
-
-    return unless grep { $type1 eq $_ } @scalar_types;
-    return unless grep { $type2 eq $_ } @scalar_types;
-
-    return 1;
-}
-
 1;

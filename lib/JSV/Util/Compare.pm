@@ -6,7 +6,7 @@ use Exporter qw(import);
 
 use Carp qw(croak);
 
-use JSV::Util::Type qw(detect_instance_type loose_type_match);
+use JSV::Util::Type qw(detect_instance_type detect_instance_type_loose);
 
 our @EXPORT_OK = (
     qw/deep_eq/
@@ -26,7 +26,13 @@ sub deep_eq {
         my $type_y = detect_instance_type($y);
 
         if ( $type_x ne $type_y ) {
-            return unless $loose_type && loose_type_match($type_x, $type_y);
+            if ( $loose_type ) {
+                my $type_x_loose = detect_instance_type_loose($x);
+                my $type_y_loose = detect_instance_type_loose($y);
+
+                return $type_x_loose eq $type_y_loose && $x == $y;
+            }
+            return 0;
         }
 
         if ( $type_x eq "array" ) {
