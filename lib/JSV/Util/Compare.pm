@@ -35,17 +35,20 @@ sub deep_eq {
             return 0;
         }
 
-        if ( $type_x eq "array" ) {
-            return if @$x ne @$y;
-            for ( my $i = 0; $i < @$x; ++$i ) {
-                push(@queue, [$x->[$i], $y->[$i]]);
-            }
+        if ( $type_x eq "null" ) {
+            # nop
         }
         elsif ( $type_x eq "boolean" || $type_x eq "integer" || $type_x eq "number" ) {
             return if $x != $y;
         }
-        elsif ( $type_x eq "null" ) {
-            # nop
+        elsif ( $type_x eq "string" ) {
+            return if $x ne $y;
+        }
+        elsif ( $type_x eq "array" ) {
+            return if @$x ne @$y;
+            for ( my $i = 0; $i < @$x; ++$i ) {
+                push(@queue, [$x->[$i], $y->[$i]]);
+            }
         }
         elsif ( $type_x eq "object" ) {
             return if %$x ne %$y;
@@ -54,8 +57,8 @@ sub deep_eq {
                 push(@queue, [$x->{$key}, $y->{$key}]);
             }
         }
-        elsif ( $type_x eq "string" ) {
-            return if $x ne $y;
+        else {
+            croak sprintf('unknown type: %s', $type_x);
         }
     }
 
