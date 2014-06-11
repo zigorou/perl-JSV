@@ -4,25 +4,15 @@ use warnings;
 use JSV::Validator;
 use Test::More;
 
-my $hash1 = { a => 3, b => 4 };
-my $hash2 = { a => 3, b => 4 };
-my $hash3 = { a => 3, b => 4 };
+sub generate_deep_hash {
+    my $n = shift;
 
-my @keys1 = keys %$hash1;
-my @keys2 = keys %$hash2;
-my @keys3 = keys %$hash3;
-
-# match order of keys
-while ( "@keys1" ne "@keys2" ) {
-  $hash2 = { a => 3, b => 4 };
-  @keys2 = keys %$hash2;
+    return +{ leaf1 => 3, leaf2 => 5 } if $n == 1;
+    return +{ node1 => generate_deep_hash($n-1), node2 => generate_deep_hash($n-1) };
 }
 
-# unmatch order of keys
-while ( "@keys1" eq "@keys3" ) {
-  $hash3 = { a => 3, b => 4 };
-  @keys3 = keys %$hash3;
-}
+my $hash1 = generate_deep_hash(10);
+my $hash2 = generate_deep_hash(10);
 
 my $schema = +{
     type => "object",
@@ -37,7 +27,7 @@ my $schema = +{
 
 my $v = JSV::Validator->new( environment => "draft4" );
 
+# fail in probability (1 - 2^10) without deep_eq in enum validation
 ok $v->validate($schema, { hoge => $hash2 });
-ok $v->validate($schema, { hoge => $hash3 });
 
 done_testing;
