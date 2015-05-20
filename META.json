@@ -4,7 +4,7 @@
       "zigorou <zigorou@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v1.0.0, CPAN::Meta::Converter version 2.120921",
+   "generated_by" : "Minilla/v1.0.0, CPAN::Meta::Converter version 2.141520",
    "license" : [
       "perl_5"
    ],
@@ -90,8 +90,10 @@
    "version" : "0.02",
    "x_contributors" : [
       "Tomohiro Mitsumune <tomohiro.mitsumune@dena.com>",
-      "yokoe.naosuke <yokoe.naosuke@dena.jp>",
       "maedama <klemensplatz+githhub@gmail.com>",
+      "Sergiy Zuban <s.zuban@trackingsoft.com>",
+      "yokoe.naosuke <yokoe.naosuke@dena.jp>",
+      "tanaka-tatsuya <ta.ts.yt@gmail.com>",
       "Naosuke Yokoe <ankerasoy@gmail.com>"
    ]
 }
