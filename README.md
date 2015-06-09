@@ -8,7 +8,7 @@ JSV - JSON Schema implementation of Perl
 
 # DESCRIPTION
 
-JSV is ...
+See e.g. [JSV::Validator](https://metacpan.org/pod/JSV::Validator)
 
 # LICENSE
 
