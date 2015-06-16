@@ -21,7 +21,7 @@ JSV - JSON Schema implementation of Perl
 
 =head1 DESCRIPTION
 
-JSV is ...
+See e.g. L<JSV::Validator>
 
 =head1 LICENSE
 
