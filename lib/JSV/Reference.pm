@@ -40,9 +40,10 @@ sub resolve {
         $self->resolve($ref_obj, $opts);
     }
 
+    %$ref = %$ref_obj;
+
     ### TODO: Does this weaken have means?
     weaken($ref_obj);
-    %$ref = %$ref_obj;
 
     $ref->{id} = $ref_uri->as_string;
 }
@@ -55,6 +56,9 @@ sub get_schema {
 
     my ($normalized_uri, $fragment) = $self->normalize_uri($uri);
     my $schema = $self->{registered_schema_map}{$normalized_uri} || $opts->{root};
+    unless (ref $schema eq 'HASH') {
+        die sprintf("cannot resolve reference: uri = %s", $uri);
+    }
 
     if (exists $schema->{'$ref'} && $schema->{'$ref'} eq $normalized_uri) {
         die sprintf("cannot resolve reference: uri = %s", $uri);

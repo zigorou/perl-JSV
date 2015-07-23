@@ -22,11 +22,10 @@ subtest "cannot resolve reference" => sub {
     subtest 'uri not found' => sub {
         local $@;
         my $ref = { '$ref' => 'http://notfound.schema.com/schema' };
-        eval {
+        throws_ok {
             $reference->resolve($ref, +{});
-        };
+        } qr/^cannot resolve reference/;
         note $@;
-        ok $@;
     };
 
     subtest 'uri found' => sub {
@@ -42,11 +41,10 @@ subtest "cannot resolve reference" => sub {
     subtest 'fragment not found' => sub {
         local $@;
         my $ref = { '$ref' => 'http://example.schema.com/schema#/bad_fragment' };
-        eval {
+        throws_ok {
             $reference->resolve($ref, +{});
-        };
+        } qr/^cannot resolve reference fragment/;
         note $@;
-        ok $@;
     };
 
     subtest 'fragment found' => sub {
