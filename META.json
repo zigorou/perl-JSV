@@ -71,8 +71,7 @@
       },
       "test" : {
          "requires" : {
-            "Test::More" : "0.98",
-            "Test::Exception" : "0"
+            "Test::More" : "0.98"
          }
       }
    },
@@ -95,6 +94,8 @@
       "Sergiy Zuban <s.zuban@trackingsoft.com>",
       "yokoe.naosuke <yokoe.naosuke@dena.jp>",
       "tanaka-tatsuya <ta.ts.yt@gmail.com>",
-      "Naosuke Yokoe <ankerasoy@gmail.com>"
+      "Naosuke Yokoe <ankerasoy@gmail.com>",
+      "Peter Valdemar Mørch <peter@morch.com>",
+      "Ichito Nagata <ichito.nagata@dena.com>"
    ]
 }

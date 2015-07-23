@@ -21,6 +21,7 @@ sub run {
             my ($schema, $instance, $expect) = @_;
             return 1;
         },
+        skip_test_cases => {},
         verbose   => 0,
         %opts
     );
@@ -29,20 +30,25 @@ sub run {
     my $test_suite = $self->load_test_suite;
 
     for my $test_cases (@$test_suite) {
-        $self->run_test_cases($test_cases);
+        $self->run_test_cases($test_cases, $opts{skip_test_cases});
     }
 
     done_testing;
 }
 
 sub run_test_cases {
-    my ($self, $test_cases) = @_;
+    my ($self, $test_cases, $skip_test_cases) = @_;
 
     my ($desc, $schema, $tests) = @$test_cases{qw/description schema tests/};
 
     subtest $desc => sub {
-        for my $test_case (@$tests) {
-            $self->run_test_case($schema, $test_case);
+        SKIP: {
+            for my $test_case (@$tests) {
+                if (exists $skip_test_cases->{$test_case->{description}}) {
+                    skip $test_case->{description} => 1;
+                }
+                $self->run_test_case($schema, $test_case);
+            }
         }
     };
 }

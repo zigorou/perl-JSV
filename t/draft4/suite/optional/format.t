@@ -19,6 +19,7 @@ subtest "strict type" => sub {
             my ($schema, $instance) = @_;
             return $validator->validate($schema, $instance);
         },
+        skip_test_cases => { "a valid protocol-relative URI" => 1, },
     );
 };
 
@@ -31,6 +32,7 @@ subtest "loose type" => sub {
             my ($schema, $instance) = @_;
             return $validator->validate($schema, $instance, +{ loose_type => 1 });
         },
+        skip_test_cases => { "a valid protocol-relative URI" => 1, },
     );
 };
 
