@@ -44,7 +44,7 @@ sub run_test_cases {
     subtest $desc => sub {
         SKIP: {
             for my $test_case (@$tests) {
-                if (exists $skip_test_cases->{$test_case->{description}}) {
+                if (defined $test_case->{description} && exists $skip_test_cases->{$test_case->{description}}) {
                     skip $test_case->{description} => 1;
                 }
                 $self->run_test_case($schema, $test_case);
