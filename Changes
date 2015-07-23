@@ -2,6 +2,12 @@ Revision history for Perl extension JSV
 
 {{$NEXT}}
 
+0.03 2015-07-23T12:04:45Z
+
+    - JSV::Reference get_schema method will die when unregistered uri is provided (Thanks by i110)
+    - Test::JSV::Suite supports skip_test_cases feature
+    - (TODO) Skipping relative-URI test case in draft-04/suite/optional/format.t 
+
 0.02 2015-05-20T06:05:48Z
 
     - original version
