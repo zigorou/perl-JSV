@@ -67,6 +67,9 @@ sub new {
         enable_history  => 0,
         reference       => JSV::Reference->new,
         formats         => +{
+            'date' => sub {
+                ($_[0] =~ /\A\d{4}-\d{2}-\d{2}\z/);
+            },
             'date-time' => sub {
                 # RFC3339
                 ($_[0] =~ /\A\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d+)?(Z|[+-]\d{2}:\d{2})/);
