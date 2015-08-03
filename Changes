@@ -2,6 +2,10 @@ Revision history for Perl extension JSV
 
 {{$NEXT}}
 
+0.04 2015-08-03T05:53:27Z
+
+    - Support date format (Thanks by addsict a.k.a fumin)
+
 0.03 2015-07-23T12:04:45Z
 
     - JSV::Reference get_schema method will die when unregistered uri is provided (Thanks by i110)
