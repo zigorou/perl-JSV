@@ -9,9 +9,23 @@ use overload
 use Carp;
 use Hash::MultiValue;
 use Class::Accessor::Lite (
-    new => 1,
-    rw  => [qw/instance error errors history/]
+    new => 0,
+    rw  => [qw/instance error errors/]
 );
+
+sub new {
+    my $class = shift;
+    my $args = ref $_[0] ? $_[0] : { @_ };
+
+    %$args = (
+        errors => [],
+        error => "",
+        %$args,
+    );
+
+    bless $args => $class;
+}
+
 
 sub equals {
     $_[0]->to_boolean == $_[1];
