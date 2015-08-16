@@ -22,6 +22,8 @@ sub validate {
         next unless (exists $instance->{$property});
 
         local $context->{current_pointer} = $context->{current_pointer} . "/" . escape_json_pointer( $property );
+        local $context->{current_schema_pointer} =
+            $context->{current_schema_pointer} . "/" . $class->keyword . "/" . escape_json_pointer( $property );
 
         if (ref $dependencies->{$property} eq "ARRAY") {
             my $found_against_dependency = first { !exists $instance->{$_} } @{$dependencies->{$property}};

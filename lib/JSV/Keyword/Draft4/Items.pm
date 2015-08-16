@@ -23,23 +23,28 @@ sub validate {
     my $additional_items_type = detect_instance_type($additional_items);
 
     if ($items_type eq "object") { ### items as schema
+        local $context->{current_schema_pointer} = $context->{current_schema_pointer} . "/" . $class->keyword;
         for (my $i = 0, my $l = scalar @$instance; $i < $l; $i++) {
-            local $context->{current_pointer} = $context->{current_pointer} . "/" . escape_json_pointer( $i );
+            local $context->{current_pointer} = $context->{current_pointer} . "/" . $i;
             $context->validate($items, $instance->[$i]);
         }
     }
     elsif ($items_type eq "array") { ### items as schema array
         for (my $i = 0, my $l = scalar @$instance; $i < $l; $i++) {
-            local $context->{current_pointer} = $context->{current_pointer} . "/" . escape_json_pointer( $i );
+            local $context->{current_pointer} = $context->{current_pointer} . "/" . $i;
 
             if (defined $items->[$i]) {
+                local $context->{current_schema_pointer} =
+                    $context->{current_schema_pointer} . "/" . $class->keyword . "/" . $i;
                 $context->validate($items->[$i], $instance->[$i]);
             }
             elsif ($additional_items_type eq "object") {
+                local $context->{current_schema_pointer} =
+                    $context->{current_schema_pointer} . "/additionalItems";
                 $context->validate($additional_items, $instance->[$i]);
             }
             elsif ($additional_items_type eq "boolean" && $additional_items == JSON::false) {
-                $context->log_error("additionalItems are now allowed");
+                $context->log_error("additionalItems are not allowed");
             }
          }
     }

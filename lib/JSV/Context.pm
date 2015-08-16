@@ -25,6 +25,8 @@ use Class::Accessor::Lite (
         current_pointer
         current_instance
         current_schema
+        current_schema_pointer
+        schema_pointer_history
     /],
 );
 
@@ -33,12 +35,15 @@ use JSON;
 use JSV::Keyword qw(:constants);
 use JSV::Util::Type qw(detect_instance_type detect_instance_type_loose);
 use JSV::Result;
+use Clone qw(clone);
 
 sub validate {
     my ($self, $schema, $instance) = @_;
 
     local $self->{current_type} = !$self->loose_type ? detect_instance_type($instance)
                                                      : detect_instance_type_loose($instance);
+
+    local $self->{cleanup_callbacks} = [];
 
     my $rv;
     eval {
@@ -91,6 +96,10 @@ sub validate {
         $self->log_error(sprintf("Unexpected error: %s", $e));
     }
 
+    while (my $cb = pop @{ $self->{cleanup_callbacks} }) {
+        $cb->();
+    }
+
     if ( scalar @{ $self->errors } ) {
         $rv = JSV::Result->new(
             errors => $self->errors,
@@ -127,11 +136,13 @@ sub log_error {
     my ($self, $message) = @_;
 
     my $error = +{
-        keyword  => $self->current_keyword,
-        pointer  => $self->current_pointer,
-        schema   => $self->current_schema,
-        instance => $self->resolve_current_instance,
-        message  => $message,
+        keyword                => $self->current_keyword,
+        pointer                => $self->current_pointer,
+        schema                 => $self->current_schema,
+        instance               => $self->resolve_current_instance,
+        schema_pointer         => $self->current_schema_pointer,
+        schema_pointer_history => clone($self->schema_pointer_history),
+        message                => $message,
     };
 
     if ( $ENV{JSV_DEBUG} ) {
@@ -174,6 +185,12 @@ sub is_matched_types {
     my ($self, @types) = @_;
 
     return (grep { $self->{current_type} eq $_ } @types) > 0 ? 1 : 0;
+}
+
+sub register_cleanup_callback {
+    my ($self, $cb) = @_;
+
+    push @{ $self->{cleanup_callbacks} }, $cb;
 }
 
 1;

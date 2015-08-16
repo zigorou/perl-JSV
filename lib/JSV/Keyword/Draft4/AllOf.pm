@@ -15,7 +15,10 @@ sub validate {
 
     my $all_of = $class->keyword_value($schema);
 
-    for my $sub_schema (@$all_of) {
+    for (my $i = 0, my $l = scalar(@$all_of); $i < $l; $i++) {
+        my $sub_schema = $all_of->[$i];
+        local $context->{current_schema_pointer} =
+            $context->{current_schema_pointer} . "/" . $class->keyword . "/" . $i;
         $context->validate($sub_schema, $instance);
     }
 }

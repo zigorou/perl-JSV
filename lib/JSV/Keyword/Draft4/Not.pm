@@ -17,6 +17,7 @@ sub validate {
     my $is_valid = 0;
 
     {
+        local $context->{current_schema_pointer} = $context->{current_schema_pointer} . "/" . $class->keyword;
         local $context->{errors} = [];
         $context->validate($not_schema, $instance);
         $is_valid = 1 if scalar @{ $context->{errors} } == 0;
