@@ -20,9 +20,11 @@ sub validate {
 
     my @patterns = ();
     my @pattern_schemas = ();
+    my @original_patterns = ();
     for my $pattern (keys %$pattern_properties) {
         push(@patterns, qr/$pattern/);
         push(@pattern_schemas, $pattern_properties->{$pattern});
+        push(@original_patterns, $pattern);
     }
 
     my $additional_properties = $class->keyword_value($schema, "additionalProperties");
@@ -33,17 +35,23 @@ sub validate {
         local $context->{current_pointer} = $context->{current_pointer} . "/" . escape_json_pointer( $property );
 
         if (exists $properties->{$property}) {
+            local $context->{current_schema_pointer} =
+                $context->{current_schema_pointer} . "/properties/" . escape_json_pointer( $property );
             $context->validate($properties->{$property}, $instance->{$property});
             delete $s{$property};
         }
 
         for (my $i = 0, my $l = scalar(@patterns); $i < $l; $i++) {
             next unless ($property =~ m/$patterns[$i]/);
+            local $context->{current_schema_pointer} =
+                $context->{current_schema_pointer} . "/patternProperties/" . escape_json_pointer( $original_patterns[$i] );
             $context->validate($pattern_schemas[$i], $instance->{$property});
             delete $s{$property};
         }
 
         if (exists $s{$property} && $additional_properties_type eq "object") {
+            local $context->{current_schema_pointer} =
+                $context->{current_schema_pointer} . "/additionalProperties";
             $context->validate($additional_properties, $instance->{$property});
         }
     }

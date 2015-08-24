@@ -16,7 +16,18 @@ sub validate {
     my $one_of = $class->keyword_value($schema);
     my $valid_cnt = 0;
 
-    for my $sub_schema (@$one_of) {
+    if (scalar(@$one_of) == 1) {
+        my $sub_schema = $one_of->[0];
+        local $context->{current_schema_pointer} =
+            $context->{current_schema_pointer} . "/" . $class->keyword . "/0";
+        $context->validate($sub_schema, $instance);
+        return;
+    }
+
+    for (my $i = 0, my $l = scalar(@$one_of); $i < $l; $i++) {
+        my $sub_schema = $one_of->[$i];
+        local $context->{current_schema_pointer} =
+            $context->{current_schema_pointer} . "/" . $class->keyword . "/" . $i;
         local $context->{errors} = [];
         $context->validate($sub_schema, $instance);
         $valid_cnt += 1 unless scalar @{ $context->{errors} };
