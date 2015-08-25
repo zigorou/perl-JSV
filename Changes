@@ -2,6 +2,11 @@ Revision history for Perl extension JSV
 
 {{$NEXT}}
 
+0.05 2015-08-24T08:24:22Z
+
+    - Add schema_pointer and schema_pointer_history fields into JSV::Context for improving debugging (Thanks by yoshizow)
+    - Fixed https://github.com/zigorou/perl-JSV/issues/36
+
 0.04 2015-08-03T05:53:27Z
 
     - Support date format (Thanks by addsict a.k.a fumin)

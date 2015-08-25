@@ -87,7 +87,7 @@
          "web" : "https://github.com/zigorou/perl-JSV"
       }
    },
-   "version" : "0.04",
+   "version" : "0.05",
    "x_contributors" : [
       "Tomohiro Mitsumune <tomohiro.mitsumune@dena.com>",
       "maedama <klemensplatz+githhub@gmail.com>",
@@ -97,6 +97,7 @@
       "Naosuke Yokoe <ankerasoy@gmail.com>",
       "Peter Valdemar Mørch <peter@morch.com>",
       "Ichito Nagata <ichito.nagata@dena.com>",
-      "Yuuki Furuyama <addsict@gmail.com>"
+      "Yuuki Furuyama <addsict@gmail.com>",
+      "Yoshitaro Makise <yoshizow@turtlewalk.org>"
    ]
 }
