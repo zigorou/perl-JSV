@@ -34,10 +34,25 @@ subtest "can resolve reference" => sub {
         ) or note explain $ref;
     };
 
-    subtest 'relative reference found' => sub {
+    subtest 'relative reference found (parent)' => sub {
         my $ref = { '$ref' => '../schema.json#/fragment' };
         my $resolved = eval {
             $reference->resolve( $ref , +{ base_uri => "http://example.schema.com/another/schema.json" });
+        };
+        ok $resolved;
+        is_deeply(
+            $ref,
+            +{
+                %{ $example_schema->{fragment} },
+                id => 'http://example.schema.com/schema.json#/fragment',
+            }
+        ) or note explain $ref;
+    };
+
+    subtest 'relative reference found (current)' => sub {
+        my $ref = { '$ref' => './schema.json#/fragment' };
+        my $resolved = eval {
+            $reference->resolve( $ref , +{ base_uri => "http://example.schema.com/another_schema.json" });
         };
         ok $resolved;
         is_deeply(
