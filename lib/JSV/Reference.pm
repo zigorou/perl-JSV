@@ -30,8 +30,12 @@ sub resolve {
     my ($self, $ref, $opts) = @_;
     die 'ref value should be hash' unless ref $ref eq 'HASH';
     die '$ref not found'           unless exists $ref->{'$ref'};
-
     my $ref_uri = URI->new($ref->{'$ref'});
+
+    if ( ! $ref_uri->scheme && $opts->{base_uri} ) {
+        $ref_uri = $ref_uri->abs($opts->{base_uri});
+    }
+ 
     die '$ref format invalid'      unless $ref_uri->scheme || $ref_uri->fragment || $ref_uri->as_string eq "#";
 
     my $ref_obj = $self->get_schema($ref_uri, $opts);
@@ -50,9 +54,6 @@ sub resolve {
 
 sub get_schema {
     my ($self, $uri, $opts) = @_;
-    if ( ! $uri->scheme && $opts->{base_uri} ) {
-        $uri = $uri->abs($opts->{base_uri});
-    }
 
     my ($normalized_uri, $fragment) = $self->normalize_uri($uri);
     my $schema = $self->{registered_schema_map}{$normalized_uri} || $opts->{root};

@@ -6,19 +6,51 @@ use Test::Exception;
 
 use JSV::Reference;
 
-subtest "cannot resolve reference" => sub {
-    my $reference = JSV::Reference->new;
-    my $example_schema = {
-        id => 'http://example.schema.com/schema',
-        fragment => {
-            type => 'object',
-            properties => {
-                foo => { type => 'integer' }, 
+my $reference = JSV::Reference->new;
+my $example_schema = {
+    id => 'http://example.schema.com/schema.json',
+    fragment => {
+        type => 'object',
+        properties => {
+            foo => { type => 'integer' }, 
+        }
+    },
+};
+$reference->register_schema( $example_schema->{id}, $example_schema );
+
+subtest "can resolve reference" => sub {
+    subtest 'fragment found' => sub {
+        my $ref = { '$ref' => 'http://example.schema.com/schema.json#/fragment' };
+        my $resolved = eval {
+            $reference->resolve( $ref , +{});
+        };
+        ok $resolved;
+        is_deeply(
+            $ref,
+            +{
+                %{ $example_schema->{fragment} },
+                id => 'http://example.schema.com/schema.json#/fragment',
             }
-        },
+        ) or note explain $ref;
     };
-    $reference->register_schema( $example_schema->{id}, $example_schema );
-    
+
+    subtest 'relative reference found' => sub {
+        my $ref = { '$ref' => '../schema.json#/fragment' };
+        my $resolved = eval {
+            $reference->resolve( $ref , +{ base_uri => "http://example.schema.com/another/schema.json" });
+        };
+        ok $resolved;
+        is_deeply(
+            $ref,
+            +{
+                %{ $example_schema->{fragment} },
+                id => 'http://example.schema.com/schema.json#/fragment',
+            }
+        ) or note explain $ref;
+    };
+};
+
+subtest "cannot resolve reference" => sub {
     subtest 'uri not found' => sub {
         local $@;
         my $ref = { '$ref' => 'http://notfound.schema.com/schema' };
@@ -30,7 +62,7 @@ subtest "cannot resolve reference" => sub {
 
     subtest 'uri found' => sub {
         local $@;
-        my $ref = { '$ref' => 'http://example.schema.com/schema' };
+        my $ref = { '$ref' => 'http://example.schema.com/schema.json' };
         my $resolved = eval {
             $reference->resolve($ref, +{});
         };
@@ -40,27 +72,11 @@ subtest "cannot resolve reference" => sub {
 
     subtest 'fragment not found' => sub {
         local $@;
-        my $ref = { '$ref' => 'http://example.schema.com/schema#/bad_fragment' };
+        my $ref = { '$ref' => 'http://example.schema.com/schema.json#/bad_fragment' };
         throws_ok {
             $reference->resolve($ref, +{});
         } qr/^cannot resolve reference fragment/;
         note $@;
-    };
-
-    subtest 'fragment found' => sub {
-        local $@;
-        my $ref = { '$ref' => 'http://example.schema.com/schema#/fragment' };
-        my $resolved = eval {
-            $reference->resolve( $ref , +{});
-        };
-        ok $resolved;
-        is_deeply(
-            $ref,
-            +{
-                %{ $example_schema->{fragment} },
-                id => 'http://example.schema.com/schema#/fragment',
-            }
-        ) or note explain $ref;
     };
 };
 
