@@ -2,6 +2,8 @@ Revision history for Perl extension JSV
 
 {{$NEXT}}
 
+    - Support relative URI for JSON reference
+
 0.05 2015-08-24T08:24:22Z
 
     - Add schema_pointer and schema_pointer_history fields into JSV::Context for improving debugging (Thanks by yoshizow)
