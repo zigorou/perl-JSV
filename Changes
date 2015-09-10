@@ -2,6 +2,8 @@ Revision history for Perl extension JSV
 
 {{$NEXT}}
 
+    - Test::JSV::Suite passes each test case to callback
+
 0.06 2015-08-25T15:20:55Z
 
     - Support relative URI for JSON reference

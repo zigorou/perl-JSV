@@ -58,7 +58,7 @@ sub run_test_case {
     my ($desc, $data, $expect) = @$test_case{qw/description data valid/};
 
     is(
-        $self->{cb}->($schema, $data, $expect),
+        $self->{cb}->($schema, $data, $expect, $test_case),
         $expect ? 1 : 0,
         $desc,
     );
