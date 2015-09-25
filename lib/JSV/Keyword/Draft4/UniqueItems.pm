@@ -18,6 +18,7 @@ sub validate {
     my $keyword_value = $class->keyword_value($schema);
 
     if ($keyword_value) {
+        $context->json->canonical(1);
         my @unique = uniq map {
             $context->json->encode($_)
         } @$instance;
@@ -25,6 +26,7 @@ sub validate {
         if (scalar @unique != scalar @$instance) {
             $context->log_error("The instance array is not unique");
         }
+        $context->json->canonical(0);
     }
 }
 
