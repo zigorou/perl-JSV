@@ -3,8 +3,8 @@ BEGIN { $ENV{PERL_JSON_BACKEND} = 'JSON::XS' }
 use strict;
 use warnings;
 use Test::More;
-use JSV::Validator;
 use Test::Requires qw(JSON::XS);
+use JSV::Validator;
 use JSON qw//;
 
 my @KEYS   = 'a'..'e';
