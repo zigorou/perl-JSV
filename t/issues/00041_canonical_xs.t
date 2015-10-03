@@ -15,9 +15,6 @@ my $schema = {
 };
 
 subtest 'check cannonical on XS' => sub {
-    my $is_xs = JSON->is_xs;
-    ok $is_xs, 'backend is xs';
-
     my $compare = { map { $_ => 1 } @KEYS };
     my $target  = { map { $_ => 1 } reverse @KEYS };
     is ($v->validate($schema, [$compare, $target]), 0, 'validated as uniqueItems');
