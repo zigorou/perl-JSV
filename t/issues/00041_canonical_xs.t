@@ -7,7 +7,7 @@ use Test::Requires qw(JSON::XS);
 use JSV::Validator;
 use JSON qw//;
 
-my @KEYS   = 'a'..'e';
+my @KEYS   = ('a'..'e');
 my $v      = JSV::Validator->new(environment => 'draft4');
 my $schema = {
     type => 'array',
@@ -19,7 +19,7 @@ subtest 'check cannonical on XS' => sub {
     ok $is_xs, 'backend is xs';
 
     my $compare = { map { $_ => 1 } @KEYS };
-    my $target  = { map { $_ => 1 } reverse keys %$compare };
+    my $target  = { map { $_ => 1 } reverse @KEYS };
     is ($v->validate($schema, [$compare, $target]), 0, 'validated as uniqueItems');
 };
 
