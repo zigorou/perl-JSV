@@ -1,10 +1,8 @@
 # NAME
 
-JSV - JSON Schema implementation of Perl
+JSV - A perl implementation of JSON Schema (draft-04) validator
 
 # SYNOPSIS
-
-    use JSV;
 
 # DESCRIPTION
 

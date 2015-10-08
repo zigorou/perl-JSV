@@ -13,11 +13,9 @@ __END__
 
 =head1 NAME
 
-JSV - JSON Schema implementation of Perl
+JSV - A perl implementation of JSON Schema (draft-04) validator
 
 =head1 SYNOPSIS
-
-    use JSV;
 
 =head1 DESCRIPTION
 
