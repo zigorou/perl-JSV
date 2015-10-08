@@ -172,7 +172,7 @@ __END__
 
 =head1 NAME
 
-JSV::Validator - A perl implementation of JSON Schema validator
+JSV::Validator - A perl implementation of JSON Schema (draft-04) validator
 
 =head1 SYNOPSIS
 
@@ -200,13 +200,34 @@ JSV::Validator - A perl implementation of JSON Schema validator
 
 =head1 DESCRIPTION
 
+JSV::Validator is implementation of JSON Schema draft-04. 
+This module passes all test suites on L<https://github.com/json-schema/JSON-Schema-Test-Suite>.
+
 =head1 METHODS
+
+=head2 load_enviroments()
+
+=head2 new
+
+=head2 validate
+
+=head2 instance_type_keywords
+
+=head2 register_schema
+
+=head2 unregister_schema
+
+=head2 register_format
 
 =head1 SEE ALSO
 
 =over
 
 =item L<http://json-schema.org/>
+
+=item L<https://github.com/json-schema/JSON-Schema-Test-Suite>
+
+JSV::Validator passes all test suites for draft-04.
 
 =item L<B>
 
