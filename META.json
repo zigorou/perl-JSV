@@ -1,5 +1,5 @@
 {
-   "abstract" : "JSON Schema implementation of Perl",
+   "abstract" : "A perl implementation of JSON Schema (draft-04) validator",
    "author" : [
       "zigorou <zigorou@cpan.org>"
    ],
@@ -71,7 +71,8 @@
       },
       "test" : {
          "requires" : {
-            "Test::More" : "0.98"
+            "Test::More" : "0.98",
+            "Test::Requires" : "0"
          }
       }
    },
@@ -87,7 +88,7 @@
          "web" : "https://github.com/zigorou/perl-JSV"
       }
    },
-   "version" : "0.06",
+   "version" : "0.07",
    "x_contributors" : [
       "Tomohiro Mitsumune <tomohiro.mitsumune@dena.com>",
       "maedama <klemensplatz+githhub@gmail.com>",
@@ -98,6 +99,7 @@
       "Peter Valdemar Mørch <peter@morch.com>",
       "Ichito Nagata <ichito.nagata@dena.com>",
       "Yuuki Furuyama <addsict@gmail.com>",
-      "Yoshitaro Makise <yoshizow@turtlewalk.org>"
+      "Yoshitaro Makise <yoshizow@turtlewalk.org>",
+      "ar-tama <arata.makoto@gmail.com>"
    ]
 }

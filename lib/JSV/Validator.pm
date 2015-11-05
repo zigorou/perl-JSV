@@ -23,7 +23,7 @@ use JSV::Reference;
 use JSV::Context;
 use Module::Pluggable::Object;
 
-our $VERSION = "0.06";
+our $VERSION = "0.07";
 
 my %supported_environments = (
     draft4 => "Draft4"
