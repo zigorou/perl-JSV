@@ -1,0 +1,8 @@
+{
+  "type": "object",
+  "properties": {
+    "föö": { "type": "integer" },
+    "bar": { "type": "string" }
+  },
+  "required": [ "föö" ]
+}
