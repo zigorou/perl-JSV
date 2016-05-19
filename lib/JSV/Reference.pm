@@ -93,8 +93,7 @@ sub register_schema {
     walkdepth(+{
         wanted => sub {
             if (
-                defined $Data::Walk::type &&
-                $Data::Walk::type eq "HASH" &&
+                ref $_ eq "HASH" &&
                 exists $_->{'$ref'} &&
                 !ref $_->{'$ref'} &&
                 keys %$_ == 1
