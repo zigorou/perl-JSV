@@ -2,6 +2,10 @@ Revision history for Perl extension JSV
 
 {{$NEXT}}
 
+0.08 2016-05-19T09:48:57Z
+
+    - Fixed recursive resolution to JSON Reference with Data::Walk 2.0x
+
 0.07 2015-11-05T13:06:30Z
 
     - Test::JSV::Suite passes each test case to callback
