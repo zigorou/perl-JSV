@@ -14,6 +14,10 @@
                 },
                 "baz": {
                     "type": "number"
+                },
+                "fizz": {
+                    "type": "integer",
+                    "enum": [0, 1]
                 }
             },
             "required": ["foo"]
@@ -39,6 +43,14 @@
                 "data": {
                     "foo": "val",
                     "baz": "-1.23"
+                },
+                "valid": false
+            },
+            {
+                "description": "String numeric value for enum",
+                "data": {
+                    "foo": "val",
+                    "fizz": "0"
                 },
                 "valid": false
             }
