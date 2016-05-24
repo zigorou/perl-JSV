@@ -1,0 +1,119 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+use Getopt::Long;
+use Pod::Usage;
+use JSV::Validator;
+use JSON;
+
+my %opt;
+GetOptions(
+    \%opt,
+    'color|c!',
+    'help|h|?',
+    'schema|s=s',
+    'quiet|q!',
+) or pod2usage( -exitval => 1, indent => 2 );
+pod2usage( -exitval => 0, indent => 2 ) if $opt{help};
+
+$opt{color} = -t STDOUT unless defined $opt{color}; ## no critic
+
+sub read_json {
+    my $file = shift;
+    my $fh;
+    if ($file eq '-') {
+        $fh = *STDIN;
+    } elsif( !open($fh, "<", $file) ) {
+        print STDERR "failed to open $file\n";
+        exit 3;
+    }
+    local $/;
+    my $json = eval { JSON->new->decode(<$fh>) } or do {
+        print STDERR "failed to parse $file\n";
+        exit 2;
+    };
+    $json;
+}
+
+JSV::Validator->load_environments("draft4");
+my $jsv = JSV::Validator->new( environment => "draft4" );
+ 
+my $schema = $opt{schema} ? read_json($opt{schema}) : { };
+ 
+my $error=0;
+foreach my $file ( @ARGV ? @ARGV : '-' ) {
+    my $instance = read_json($file);
+    my $result = $jsv->validate($schema, $instance);    
+    unless ($opt{quiet}) {
+        my $valid = $result ? 'valid  ' : 'invalid';
+        if ($opt{color}) {
+            $valid = ($result ? "\e[0;32m" : "\e[1;31m") . $valid . "\e[0m";
+        }
+        print "$valid $file\n";
+    }
+    $error = 1 unless $result;
+}
+
+exit $error;
+
+=head1 NAME
+
+jsv - validate JSON files against JSON Schema
+
+=head1 SYNOPSIS
+
+jsv -s schema.json [ file1.json file2.json ... | < file.json ]
+
+=head1 USAGE
+
+This script validates JSON against a JSON Schema. 
+
+=head2 Exit codes
+
+=over
+
+=item 0
+
+JSON is valid
+
+=item 1
+
+JSON is invalid
+
+=item 2
+
+JSON could not be parsed
+
+=item 3
+
+input file not found or not readable
+
+=back
+
+=head1 OPTIONS
+
+=over
+
+=item --schema|-s FILE
+
+JSON Schema file to validate with. Use C<-> for STDIN
+
+=item --color|-c
+
+Show validation result in color (default). Disable with C<--no-color>
+
+=item --quiet
+
+Don't output validation result
+
+=item --help|-h|-?
+
+show this help
+
+=back
+
+=head1 SEE ALSO
+
+L<JSV::Validator>
+
+=cut

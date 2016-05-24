@@ -19,7 +19,7 @@ JSV - A perl implementation of JSON Schema (draft-04) validator
 
 =head1 DESCRIPTION
 
-See e.g. L<JSV::Validator>
+See L<JSV::Validator> (module) and L<jsv> (command line script).
 
 =head1 LICENSE
 
