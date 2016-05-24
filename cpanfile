@@ -22,6 +22,7 @@ requires 'Module::Pluggable::Object';
 requires 'Scalar::Util';
 requires 'URI';
 requires 'URI::Split';
+requires 'Test::Deep';
 
 on 'test' => sub {
     requires 'Test::More', '0.98';
