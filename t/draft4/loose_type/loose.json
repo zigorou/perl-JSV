@@ -16,11 +16,9 @@
                     "type": "number"
                 },
                 "fizz": {
-                    "type": "integer",
                     "enum": [0, 1]
                 },
                 "piyo": {
-                    "type": "object",
                     "enum": [{
                         "key1": 1,
                         "key2": 2
@@ -57,7 +55,7 @@
                 "valid": true
             },
             {
-                "description": "String numeric value for enum",
+                "description": "String integer value for enum",
                 "data": {
                     "foo": "val",
                     "fizz": "0"
@@ -65,7 +63,7 @@
                 "valid": true
             },
             {
-                "description": "String numeric value in object for enum - 1",
+                "description": "object for enum",
                 "data": {
                     "foo": "val",
                     "piyo": {
@@ -76,7 +74,7 @@
                 "valid": true
             },
             {
-                "description": "String numeric value in object for enum - 2",
+                "description": "String integer value in object for enum",
                 "data": {
                     "foo": "val",
                     "piyo": {
