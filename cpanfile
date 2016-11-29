@@ -4,7 +4,6 @@ requires 'B';
 requires 'Carp';
 requires 'Class::Accessor::Lite';
 requires 'Clone';
-requires 'Data::Walk';
 requires 'Data::Validate::Domain';
 requires 'Data::Validate::IP';
 requires 'Data::Validate::URI';
