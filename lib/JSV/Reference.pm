@@ -5,7 +5,6 @@ use warnings;
 
 use Carp;
 use Clone qw(clone);
-use Data::Walk;
 use JSON::Pointer;
 use Scalar::Util qw(weaken);
 use URI;
@@ -88,23 +87,7 @@ sub register_schema {
     my ($self, $uri, $schema) = @_;
     my $normalized_uri = $self->normalize_uri($uri);
     my $cloned_schema = clone($schema);
-
-    ### recursive reference resolution
-    walkdepth(+{
-        wanted => sub {
-            if (
-                ref $_ eq "HASH" &&
-                exists $_->{'$ref'} &&
-                !ref $_->{'$ref'} &&
-                keys %$_ == 1
-            ) {
-                my $ref_uri = URI->new($_->{'$ref'});
-                return if $ref_uri->scheme;
-                $_->{'$ref'} = $ref_uri->abs($normalized_uri)->as_string;
-            }
-        },
-    }, $cloned_schema);
-
+    $self->_resolve_ref_uri($cloned_schema, $normalized_uri);
     $self->{registered_schema_map}{$normalized_uri} = $cloned_schema;
 }
 
@@ -125,6 +108,28 @@ sub normalize_uri {
     my $normalized_uri = uri_join(@parts{qw/scheme authority path query fragment/});
 
     return wantarray ? ($normalized_uri, $fragment) : $normalized_uri;
+}
+
+sub _resolve_ref_uri {
+    my ($self, $value, $base_uri) = @_;
+
+    if (
+        ref $value eq 'HASH' &&
+        exists $value->{'$ref'} &&
+        !ref $value->{'$ref'} &&
+        keys %$value == 1
+    ) {
+        my $ref_uri = URI->new($value->{'$ref'});
+        $value->{'$ref'} = $ref_uri->abs($base_uri)->as_string unless $ref_uri->scheme;
+        return $value;
+    }
+
+    if (ref $value eq 'HASH') {
+        $value->{$_} = $self->_resolve_ref_uri($value->{$_}, $base_uri) for keys %$value;
+    } elsif (ref $value eq 'ARRAY') {
+        $value->[$_] = $self->_resolve_ref_uri($value->[$_], $base_uri) for (0..$#$value);
+    }
+    return $value;
 }
 
 1;
