@@ -68,7 +68,11 @@ sub new {
         reference       => JSV::Reference->new,
         formats         => +{
             'date' => sub {
-                ($_[0] =~ /\A\d{4}-\d{2}-\d{2}\z/);
+                my ($year, $month, $mday) = ($_[0] =~ /\A(\d{4})-(\d{2})-(\d{2})\z/) or return;
+                return 0 if $month > 12 || $month < 1 ||
+                    $mday > [31,29,31,30,31,30,31,31,30,31,30,31]->[$month-1] ||
+                    ($mday == 29 && $month == 2 && !($year % 4 == 0 && ($year % 100 != 0 || $year % 400 == 0)));
+                return 1;
             },
             'date-time' => sub {
                 # RFC3339
